@@ -8,6 +8,11 @@ package de.zabuza.memeaterbug.locale;
  */
 public final class ErrorMessages {
 	/**
+	 * Thrown when trying to create a {@link de.zabuza.memeaterbug.MemEaterBug
+	 * MemEaterBug} with an operating system that is not Windows.
+	 */
+	public static final String OS_IS_NOT_WINDOWS = "Mem-Eater-Bug can only be used on a Windows operating system: ";
+	/**
 	 * Thrown when a {@link de.zabuza.memeaterbug.MemEaterBug MemEaterBug} tries
 	 * to find its corresponding process, but the given process id was invalid.
 	 */
@@ -29,11 +34,6 @@ public final class ErrorMessages {
 	 * it was not hooked to a process.
 	 */
 	public static final String PROCESS_UNABLE_TO_UNHOOK_SINCE_NOT_HOOKED = "Unable to unhook since not hooked to a process.";
-	/**
-	 * Thrown when trying to create a {@link de.zabuza.memeaterbug.MemEaterBug
-	 * MemEaterBug} with an operating system that is not Windows.
-	 */
-	public static final String OS_IS_NOT_WINDOWS = "Mem-Eater-Bug can only be used on a Windows operating system: ";
 	/**
 	 * Thrown when a method could not be executed since the
 	 * {@link de.zabuza.memeaterbug.MemEaterBug MemEaterBug} was not hooked to a
