@@ -5,6 +5,7 @@ import com.sun.jna.platform.win32.WinDef.HMODULE;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 
 import de.zabuza.memeaterbug.winapi.jna.Psapi.LPMODULEINFO;
+import de.zabuza.memeaterbug.winapi.jna.util.Kernel32Util;
 import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 
 /**
@@ -18,6 +19,32 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
  *
  */
 public final class Module {
+
+	/**
+	 * Size of a module handle {@link HMODULE} in a 32 bit process.
+	 */
+	private static final int MODULE_SIZE_32 = 4;
+	/**
+	 * Size of a module handle {@link HMODULE} in a 64 bit process.
+	 */
+	private static final int MODULE_SIZE_64 = 8;
+
+	/**
+	 * Gets the size of a module handle {@link HMODULE} in the given process. It
+	 * is determined by the architecture the process is using.
+	 * 
+	 * @param hProcess
+	 *            Handle to the process
+	 * @return The size of a module handle {@link HMODULE} in the given process,
+	 *         in bytes
+	 */
+	public static int getSizeOfModule(final HANDLE hProcess) {
+		if (Kernel32Util.is64Bit(hProcess)) {
+			return MODULE_SIZE_64;
+		} else {
+			return MODULE_SIZE_32;
+		}
+	}
 
 	/**
 	 * The entry point of the module.
@@ -113,7 +140,7 @@ public final class Module {
 	 *         module
 	 */
 	public String getFileName() {
-		return PsapiUtil.GetModuleFileNameEx(mHProcess, mHModule);
+		return PsapiUtil.getModuleFileNameEx(mHProcess, mHModule);
 	}
 
 	/**
@@ -167,7 +194,7 @@ public final class Module {
 	private void extractModuleInformation() {
 		if (mEntryPoint == null) {
 			try {
-				LPMODULEINFO x = PsapiUtil.GetModuleInformation(mHProcess, mHModule);
+				LPMODULEINFO x = PsapiUtil.getModuleInformation(mHProcess, mHModule);
 				mLpBaseOfDll = x.lpBaseOfDll;
 				mSizeOfImage = x.SizeOfImage;
 				mEntryPoint = x.EntryPoint;

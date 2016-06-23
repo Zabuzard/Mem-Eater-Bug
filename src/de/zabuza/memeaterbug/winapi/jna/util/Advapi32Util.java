@@ -12,10 +12,31 @@ import com.sun.jna.platform.win32.WinNT.LUID;
 import com.sun.jna.platform.win32.WinNT.LUID_AND_ATTRIBUTES;
 import com.sun.jna.platform.win32.WinNT.TOKEN_PRIVILEGES;
 
-public abstract class Advapi32Util {
-	public static void enableDebugPrivilege(HANDLE hProcess) {
+/**
+ * Provides various utility methods that use the JNA interface for Windows
+ * ADVAPI32.DLL, which is the advanced Windows API. It provides access to
+ * functions beyond the kernel. Included are things like the Windows registry,
+ * shutdown/restart the system (or abort), start/stop/create a Windows service
+ * or manage user accounts.
+ * 
+ * @author Zabuza
+ *
+ */
+public final class Advapi32Util {
+	/**
+	 * Enables the SeDebugPrivilege privilege for the given process.
+	 * 
+	 * @see <a href= <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
+	 * @param hProcess
+	 *            Process to enable SeDebugPrivilege privilege for
+	 * @throws Win32Exception
+	 *             If the method was not successful
+	 */
+	public static void enableDebugPrivilege(final HANDLE hProcess) throws Win32Exception {
 		HANDLEByReference hToken = new HANDLEByReference();
-		Win32Exception we = null;
+		Win32Exception winException = null;
 		try {
 			if (!Advapi32.INSTANCE.OpenProcessToken(hProcess, WinNT.TOKEN_QUERY | WinNT.TOKEN_ADJUST_PRIVILEGES,
 					hToken)) {
@@ -33,20 +54,26 @@ public abstract class Advapi32Util {
 				throw new Win32Exception(Native.getLastError());
 			}
 		} catch (Win32Exception e) {
-			we = e;
+			winException = e;
 		} finally {
 			if (!Kernel32.INSTANCE.CloseHandle(hToken.getValue())) {
 				Win32Exception e = new Win32Exception(Native.getLastError());
-				if (we != null) {
-					e.addSuppressed(we);
+				if (winException != null) {
+					e.addSuppressed(winException);
 				}
-				we = e;
+				winException = e;
 			}
 		}
 
-		if (we != null) {
-			throw we;
+		if (winException != null) {
+			throw winException;
 		}
 	}
 
+	/**
+	 * Utility class. No implementation.
+	 */
+	private Advapi32Util() {
+
+	}
 }

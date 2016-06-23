@@ -130,7 +130,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 *         If the function fails, the return value is zero. To get extended
 	 *         error information, call {@link #Native.GetLastError()}.
 	 */
-	boolean EnumProcessModules(final HANDLE hProcess, final HMODULE[] lphModule, final int cb,
+	public boolean EnumProcessModules(final HANDLE hProcess, final HMODULE[] lphModule, final int cb,
 			final IntByReference lpcbNeededs);
 
 	/**
@@ -164,7 +164,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 *         If the function fails, the return value is zero. To get extended
 	 *         error information, call {@link #Native.GetLastError()}.
 	 */
-	boolean EnumProcessModulesEx(final HANDLE hProcess, final HMODULE[] lphModule, final int cb,
+	public boolean EnumProcessModulesEx(final HANDLE hProcess, final HMODULE[] lphModule, final int cb,
 			final IntByReference lpcbNeededs, final int dwFilterFlag);
 
 	/**
@@ -195,7 +195,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 *         If the function fails, the return value is zero. To get extended
 	 *         error information, call {@link #Native.GetLastError()}.
 	 */
-	boolean GetModuleInformation(final HANDLE hProcess, final HMODULE hModule, final LPMODULEINFO lpmodinfo,
+	public boolean GetModuleInformation(final HANDLE hProcess, final HMODULE hModule, final LPMODULEINFO lpmodinfo,
 			final int cb);
 
 	/**
@@ -222,6 +222,6 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 *         If the function fails, the return value is zero. To get extended
 	 *         error information, call {@link #Native.GetLastError()}.
 	 */
-	int GetProcessImageFileName(final HANDLE hProcess, final byte[] lpImageFileName, final int nSize);
+	public int GetProcessImageFileName(final HANDLE hProcess, final byte[] lpImageFileName, final int nSize);
 
 }

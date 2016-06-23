@@ -24,7 +24,6 @@ public interface Shell32 extends com.sun.jna.platform.win32.Shell32 {
 	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms648069(v=vs.85).aspx">
 	 *      MSDN webpage#ExtractIconEx function</a>
-	 * 
 	 * @param lpszFile
 	 *            The name of an executable file, DLL, or icon file from which
 	 *            icons will be extracted.

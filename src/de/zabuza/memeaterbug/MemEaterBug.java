@@ -8,6 +8,7 @@ import de.zabuza.memeaterbug.util.SystemProperties;
 import de.zabuza.memeaterbug.winapi.api.Process;
 import de.zabuza.memeaterbug.winapi.jna.util.User32Util;
 import de.zabuza.memeaterbug.winapi.jna.util.Kernel32Util;
+import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 
 /**
  * Provides various methods for memory manipulation on Windows systems using
@@ -72,6 +73,21 @@ public final class MemEaterBug {
 
 	/**
 	 * Creates a new Mem-Eater-Bug that can interact with a process, given by
+	 * the name of its exe-file.<br/>
+	 * <br/>
+	 * After creation, {@link #hookProcess()} must be used before Mem-Eater-Bug
+	 * is able to interact. Before shutdown, {@link #unhookProcess()} should be
+	 * used to free resources.
+	 * 
+	 * @param szExeFile
+	 *            Name of the exe-File of the process.
+	 */
+	public MemEaterBug(final String szExeFile) {
+		this(PsapiUtil.getProcessIdBySzExeFile(szExeFile));
+	}
+
+	/**
+	 * Creates a new Mem-Eater-Bug that can interact with a process, given by
 	 * its process class name or the window title. In case only one argument
 	 * should be used, set the other to <tt>null</tt>.<br/>
 	 * <br/>
@@ -85,7 +101,7 @@ public final class MemEaterBug {
 	 *            The window title of the process windows
 	 */
 	public MemEaterBug(final String processClassName, final String windowTitle) {
-		this(User32Util.GetWindowThreadProcessIdByClassAndTitle(processClassName, windowTitle).getValue());
+		this(User32Util.getWindowThreadProcessIdByClassAndTitle(processClassName, windowTitle).getValue());
 	}
 
 	/**
@@ -133,12 +149,12 @@ public final class MemEaterBug {
 	 */
 	public void hookProcess(final int permissions) {
 		if (!mIsHooked) {
-			mProcessHandle = Kernel32Util.OpenProcess(permissions, true, mProcessId);
+			mProcessHandle = Kernel32Util.openProcess(permissions, true, mProcessId);
 		} else {
 			throw new IllegalStateException(ErrorMessages.PROCESS_UNABLE_TO_HOOK_SINCE_ALREADY_HOOKED);
 		}
 		mIsHooked = true;
-		mIs64BitProcess = Kernel32Util.Is64Bit(mProcessHandle);
+		mIs64BitProcess = Kernel32Util.is64Bit(mProcessHandle);
 	}
 
 	/**
@@ -179,7 +195,7 @@ public final class MemEaterBug {
 	 */
 	public void unhookProcess() {
 		if (mIsHooked) {
-			Kernel32Util.CloseHandle(mProcessHandle);
+			Kernel32Util.closeHandle(mProcessHandle);
 		} else {
 			throw new IllegalStateException(ErrorMessages.PROCESS_UNABLE_TO_UNHOOK_SINCE_NOT_HOOKED);
 		}

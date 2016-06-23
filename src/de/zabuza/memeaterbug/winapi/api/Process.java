@@ -274,7 +274,7 @@ public final class Process {
 		if (mHandleCache != null) {
 			return mHandleCache;
 		}
-		mHandleCache = Kernel32Util.OpenProcess(Kernel32Util.PROCESS_ALL_ACCESS, false, mPid);
+		mHandleCache = Kernel32Util.openProcess(Kernel32Util.PROCESS_ALL_ACCESS, false, mPid);
 		return mHandleCache;
 	}
 
@@ -309,13 +309,13 @@ public final class Process {
 
 		HICON hIcon = null;
 
-		Pointer firstAttempt = Shell32Util.ExtractSmallIcon(getModuleFileNameExA(), 1);
+		Pointer firstAttempt = Shell32Util.extractSmallIcon(getModuleFileNameExA(), 1);
 		if (firstAttempt != null) {
 			hIcon = new HICON(firstAttempt);
 		}
 
 		if (hIcon == null) {
-			Pointer secondAttempt = Shell32Util.ExtractSmallIcon(mSzExeFile, 1);
+			Pointer secondAttempt = Shell32Util.extractSmallIcon(mSzExeFile, 1);
 			if (secondAttempt != null) {
 				hIcon = new HICON(secondAttempt);
 			}
@@ -370,7 +370,7 @@ public final class Process {
 	 */
 	public String getModuleFileNameExA() {
 		try {
-			return PsapiUtil.GetModuleFileNameEx(getHandle(), null);
+			return PsapiUtil.getModuleFileNameEx(getHandle(), null);
 		} catch (Exception e) {
 			return "";
 		}
@@ -387,7 +387,7 @@ public final class Process {
 	 */
 	public List<Module> getModules() {
 		try {
-			List<HMODULE> pointers = PsapiUtil.EnumProcessModules(getHandle());
+			List<HMODULE> pointers = PsapiUtil.enumProcessModules(getHandle());
 			List<Module> modules = new LinkedList<Module>();
 			for (HMODULE hModule : pointers) {
 				modules.add(new Module(getHandle(), hModule));
@@ -435,7 +435,7 @@ public final class Process {
 	 */
 	public String getProcessImageFileName() {
 		try {
-			return PsapiUtil.GetProcessImageFileName(getHandle());
+			return PsapiUtil.getProcessImageFileName(getHandle());
 		} catch (Exception e) {
 			return "";
 		}
@@ -554,6 +554,6 @@ public final class Process {
 	 */
 	public void readProcessMemory(final int pAddress, final Pointer outputBuffer, final int nSize,
 			final IntByReference outNumberOfBytesRead) {
-		Kernel32Util.ReadProcessMemory(getHandle(), pAddress, outputBuffer, nSize, outNumberOfBytesRead);
+		Kernel32Util.readProcessMemory(getHandle(), pAddress, outputBuffer, nSize, outNumberOfBytesRead);
 	}
 }
