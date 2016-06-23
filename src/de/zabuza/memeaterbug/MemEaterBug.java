@@ -95,14 +95,20 @@ public final class MemEaterBug {
 	 * <br/>
 	 * It requests the following permissions for interaction with the process:
 	 * <ul>
-	 * <li>PROCESS_QUERY_INFORMATION</li>
-	 * <li>PROCESS_VM_READ</li>
-	 * <li>PROCESS_VM_WRITE</li>
-	 * <li>PROCESS_VM_OPERATION</li>
+	 * <li>
+	 * {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 * PROCESS_QUERY_INFORMATION}</li>
+	 * <li>{@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_READ
+	 * PROCESS_VM_READ}</li>
+	 * <li>{@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_WRITE
+	 * PROCESS_VM_WRITE}</li>
+	 * <li>{@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_OPERATION
+	 * PROCESS_VM_OPERATION}</li>
 	 * </ul>
-	 * For details refer to the corresponding <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx"> MSDN
-	 * webpage#Process Security and Access Rights</a>.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
 	 * 
 	 * @throws IllegalStateException
 	 *             If the Mem-Eater-Bug is already hooked to a process
@@ -118,10 +124,10 @@ public final class MemEaterBug {
 	 * shutdown, {@link #unhookProcess()} should be used to free resources.
 	 * 
 	 * @param permissions
-	 *            Requested permissions for interaction with the process. For
-	 *            details refer to the corresponding <a href=
-	 *            "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
-	 *            MSDN webpage#Process Security and Access Rights</a>.
+	 *            Requested permissions for interaction with the process.
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
 	 * @throws IllegalStateException
 	 *             If the Mem-Eater-Bug is already hooked to a process
 	 */

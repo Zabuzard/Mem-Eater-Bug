@@ -15,6 +15,7 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 
+import de.zabuza.memeaterbug.util.Formats;
 import de.zabuza.memeaterbug.winapi.jna.User32;
 import de.zabuza.memeaterbug.winapi.jna.util.Kernel32Util;
 import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
@@ -23,144 +24,157 @@ import de.zabuza.memeaterbug.winapi.jna.util.User32Util;
 
 /**
  * Provides various process related methods for interaction with the Windows
- * API.<br/>
- * <br/>
- * See
- * <a href= "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
- * MSDN webpage#PROCESSENTRY32 structure</a> for more information.
+ * API.
+ * 
+ * @see <a href= <a href=
+ *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
+ *      webpage#PROCESSENTRY32 structure</a>
  * 
  * @author Zabuza
  *
  */
 public final class Process {
 	/**
-	 * All possible access rights for a process object.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx"> MSDN
-	 * webpage#Process Security and Access Rights</a> for more information.
+	 * All possible access rights for a process object.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
 	 */
 	public static int PROCESS_ALL_ACCESS = 0x001F0FFF;
 	/**
 	 * Required to retrieve certain information about a process, such as its
-	 * token, exit code, and priority class.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx"> MSDN
-	 * webpage#Process Security and Access Rights</a> for more information.
+	 * token, exit code, and priority class.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
 	 */
 	public static int PROCESS_QUERY_INFORMATION = 0x0400;
 	/**
-	 * Required to perform an operation on the address space of a process.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx"> MSDN
-	 * webpage#Process Security and Access Rights</a> for more information.
+	 * Required to retrieve certain information about a process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
+	 */
+	public static int PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
+	/**
+	 * Required to perform an operation on the address space of a process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
 	 */
 	public static int PROCESS_VM_OPERATION = 0x0008;
 	/**
 	 * Required to read memory in a process using Windows ReadProcessMemory
-	 * function.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx"> MSDN
-	 * webpage#Process Security and Access Rights</a> for more information.
+	 * function.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
 	 */
 	public static int PROCESS_VM_READ = 0x0010;
 	/**
 	 * Required to write to memory in a process using Windows WriteProcessMemory
-	 * function.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx"> MSDN
-	 * webpage#Process Security and Access Rights</a> for more information.
+	 * function.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
+	 *      MSDN webpage#Process Security and Access Rights</a>
 	 */
 	public static int PROCESS_VM_WRITE = 0x0020;
+	/**
+	 * Index of the module that corresponds to this process, in the module list
+	 * of the process.
+	 */
+	private static int PROCESS_MODULE_INDEX = 0;
 
 	/**
-	 * The number of execution threads started by the process.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
-	 * webpage#PROCESSENTRY32 structure</a> for more information.
+	 * The number of execution threads started by the process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
 	 */
 	private final int mCntThreads;
 	/**
 	 * Cached handle to this process that has all access rights. Updated by
-	 * {@link #getHandle()}.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684868(v=vs.85).aspx">MSDN
-	 * webpage#Process Handles and Identifiers</a> for more information.
+	 * {@link #getHandle()}.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684868(v=vs.85).aspx">
+	 *      MSDN webpage#Process Handles and Identifiers</a>
 	 */
 	private HANDLE mHandleCache;
 	/**
 	 * List of windows the process has, as window handles. Can be added using
-	 * {@link #addHwnd(HWND)}.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms633515(v=vs.85).aspx">MSDN
-	 * webpage#GetWindow function</a> for more information.
+	 * {@link #addHwnd(HWND)}.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms633515(v=vs.85).aspx">
+	 *      MSDN webpage#GetWindow function</a>
 	 */
 	private List<HWND> mHWindows;
 	/**
-	 * A cached icon of this process. Updated by {@link #getIcon()}.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms648070(v=vs.85).aspx">MSDN
-	 * webpage#GetIconInfo function</a> for more information.
+	 * A cached icon of this process. Updated by {@link #getIcon()}.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms648070(v=vs.85).aspx">
+	 *      MSDN webpage#GetIconInfo function</a>
 	 */
 	private ImageIcon mIconCache;
 	/**
 	 * Cached first module of this process module list which is the module for
-	 * this process. Updated by {@link #getModule()}.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx"> MSDN
-	 * webpage#MODULEINFO structure</a> for more information.
+	 * this process. Updated by {@link #getModule()}.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx">
+	 *      MSDN webpage#MODULEINFO structure</a>
 	 */
 	private Module mModuleCache;
 	/**
-	 * The base priority of any threads created by this process.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
-	 * webpage#PROCESSENTRY32 structure</a> for more information.
+	 * The base priority of any threads created by this process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
 	 */
 	private final int mPcPriClassBase;
 	/**
-	 * The process identifier.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
-	 * webpage#PROCESSENTRY32 structure</a> for more information.
+	 * The process identifier.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
 	 */
 	private final int mPid;
 	/**
-	 * The name of the executable file for the process.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
-	 * webpage#PROCESSENTRY32 structure</a> for more information.
+	 * The name of the executable file for the process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
 	 */
 	private final String mSzExeFile;
 	/**
 	 * The identifier of the process that created this process (its parent
-	 * process).<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
-	 * webpage#PROCESSENTRY32 structure</a> for more information.
+	 * process).
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
 	 */
 	private final int mTh32ParentProcessID;
 
 	/**
 	 * Creates a new process wrapper that is able to read information from the
-	 * process, given by its PROCESSENTRY32 structure.<br/>
-	 * <br/>
-	 * See <a href=
-	 * "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
-	 * webpage#PROCESSENTRY32 structure</a> for more information.
+	 * process, given by its PROCESSENTRY32 structure.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
 	 * 
 	 * @param pe32
 	 *            PROCESSENTRY32 structure of the process to wrap around
@@ -178,6 +192,16 @@ public final class Process {
 		mHWindows = new LinkedList<HWND>();
 	}
 
+	/**
+	 * Adds the handle to a a window the process has.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms633515(v=vs.85).aspx">
+	 *      MSDN webpage#GetWindow function</a>
+	 * 
+	 * @param hWnd
+	 *            Window handle to add
+	 */
 	public void addHwnd(final HWND hWnd) {
 		mHWindows.add(hWnd);
 	}
@@ -188,7 +212,7 @@ public final class Process {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -205,6 +229,15 @@ public final class Process {
 		return true;
 	}
 
+	/**
+	 * Pointer to the load address of this process module.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx">
+	 *      MSDN webpage#MODULEINFO structure</a>
+	 * 
+	 * @return Pointer to the load address of this process module
+	 */
 	public Pointer getBase() {
 		Module module = getModule();
 		if (module != null) {
@@ -214,10 +247,29 @@ public final class Process {
 		}
 	}
 
+	/**
+	 * Gets the number of execution threads started by the process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
+	 * 
+	 * @return The number of execution threads started by the process
+	 */
 	public int getCntThreads() {
 		return mCntThreads;
 	}
 
+	/**
+	 * Gets a handle to this process that has all access rights, caches output
+	 * for further method calls.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684868(v=vs.85).aspx">
+	 *      MSDN webpage#Process Handles and Identifiers</a>
+	 * 
+	 * @return A handle to this process that has all access rights
+	 */
 	public HANDLE getHandle() {
 		if (mHandleCache != null) {
 			return mHandleCache;
@@ -226,10 +278,30 @@ public final class Process {
 		return mHandleCache;
 	}
 
+	/**
+	 * Gets a list of windows the process has, as window handles. Can be added
+	 * using {@link #addHwnd(HWND)}.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms633515(v=vs.85).aspx">
+	 *      MSDN webpage#GetWindow function</a>
+	 * 
+	 * @return A list of windows the process has, as window handles
+	 */
 	public List<HWND> getHwnds() {
 		return mHWindows;
 	}
 
+	/**
+	 * Gets the icon of this process. Caches the output for further method
+	 * calls.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms648070(v=vs.85).aspx">
+	 *      MSDN webpage#GetIconInfo function</a>
+	 * 
+	 * @return The icon of this process
+	 */
 	public ImageIcon getIcon() {
 		if (mIconCache != null) {
 			return mIconCache;
@@ -237,15 +309,15 @@ public final class Process {
 
 		HICON hIcon = null;
 
-		Pointer attempt_1 = Shell32Util.ExtractSmallIcon(getModuleFileNameExA(), 1);
-		if (attempt_1 != null) {
-			hIcon = new HICON(attempt_1);
+		Pointer firstAttempt = Shell32Util.ExtractSmallIcon(getModuleFileNameExA(), 1);
+		if (firstAttempt != null) {
+			hIcon = new HICON(firstAttempt);
 		}
 
 		if (hIcon == null) {
-			Pointer attempt_2 = Shell32Util.ExtractSmallIcon(mSzExeFile, 1);
-			if (attempt_2 != null) {
-				hIcon = new HICON(attempt_2);
+			Pointer secondAttempt = Shell32Util.ExtractSmallIcon(mSzExeFile, 1);
+			if (secondAttempt != null) {
+				hIcon = new HICON(secondAttempt);
 			}
 		}
 
@@ -253,7 +325,6 @@ public final class Process {
 			if (mHWindows.size() > 0) {
 				hIcon = User32Util.getHIcon(User32.INSTANCE.GetAncestor(mHWindows.get(0), User32.GA_ROOTOWNER));
 			}
-
 		}
 
 		if (hIcon != null) {
@@ -264,17 +335,39 @@ public final class Process {
 		return mIconCache;
 	}
 
+	/**
+	 * Gets the first module of this process module list which is the module for
+	 * this process. Caches the output for further method calls.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx">
+	 *      MSDN webpage#MODULEINFO structure</a>
+	 * 
+	 * @return The first module of this process module list which is the module
+	 *         for this process.
+	 */
 	public Module getModule() {
 		if (mModuleCache != null) {
 			return mModuleCache;
 		}
 		List<Module> modules = getModules();
-		if (modules != null && modules.size() > 0) {
-			mModuleCache = modules.get(0);
+		if (modules != null && modules.size() > PROCESS_MODULE_INDEX) {
+			mModuleCache = modules.get(PROCESS_MODULE_INDEX);
 		}
 		return mModuleCache;
 	}
 
+	/**
+	 * Retrieves the fully qualified path for the file containing this process
+	 * module.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms683198(v=vs.85).aspx">
+	 *      MSDN webpage#GetModuleFileNameEx function</a>
+	 * 
+	 * @return The fully qualified path for the file containing this process
+	 *         module
+	 */
 	public String getModuleFileNameExA() {
 		try {
 			return PsapiUtil.GetModuleFileNameEx(getHandle(), null);
@@ -283,6 +376,15 @@ public final class Process {
 		}
 	}
 
+	/**
+	 * Gets the list of modules that belong to this process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms682631(v=vs.85).aspx">
+	 *      MSDN webpage#EnumProcessModules function</a>
+	 * 
+	 * @return The list of modules that belong to this process
+	 */
 	public List<Module> getModules() {
 		try {
 			List<HMODULE> pointers = PsapiUtil.EnumProcessModules(getHandle());
@@ -296,14 +398,41 @@ public final class Process {
 		}
 	}
 
+	/**
+	 * Gets the base priority of any threads created by this process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
+	 * 
+	 * @return The base priority of any threads created by this process
+	 */
 	public int getPcPriClassBase() {
 		return mPcPriClassBase;
 	}
 
+	/**
+	 * Gets the process identifier.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
+	 * 
+	 * @return The process identifier
+	 */
 	public int getPid() {
 		return mPid;
 	}
 
+	/**
+	 * Retrieves the name of the executable file for this process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms683217(v=vs.85).aspx">
+	 *      MSDN webpage#GetProcessImageFileName function</a>
+	 * 
+	 * @return The name of the executable file for this process
+	 */
 	public String getProcessImageFileName() {
 		try {
 			return PsapiUtil.GetProcessImageFileName(getHandle());
@@ -312,6 +441,15 @@ public final class Process {
 		}
 	}
 
+	/**
+	 * Gets the size of the linear space that the process module occupies.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx">
+	 *      MSDN webpage#MODULEINFO structure</a>
+	 * 
+	 * @return The size of the linear space that the process module occupies
+	 */
 	public int getSize() {
 		Module module = getModule();
 		if (module != null) {
@@ -321,28 +459,58 @@ public final class Process {
 		}
 	}
 
+	/**
+	 * Gets the name of the module the given address belongs to and the address
+	 * offset from the beginning of the module as 8 placed hexadecimal.
+	 * 
+	 * @param address
+	 *            Address of interest
+	 * @return The name of the module the given address belongs to and the
+	 *         address offset from the beginning of the module as 8 placed
+	 *         hexadecimal
+	 */
 	public String getStatic(final Long address) {
 		if (address == null) {
 			return null;
 		}
 		List<Module> modules = getModules();
-		long begin, end;
+		long begin;
+		long end;
 		for (Module module : modules) {
 			begin = Pointer.nativeValue(module.getLpBaseOfDll());
 			end = begin + module.getSizeOfImage();
-			// log.trace("module "+begin+" "+end+" "+module.getFileName());
 			if (begin <= address && address <= end) {
 				File f = new File(module.getFileName());
-				return f.getName() + "+" + String.format("%08X", address - begin);
+				return f.getName() + "+" + String.format(Formats.EIGHT_HEX_NUMBER, address - begin);
 			}
 		}
 		return null;
 	}
 
+	/**
+	 * Gets the name of the executable file for the process.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
+	 * 
+	 * @return The name of the executable file for the process
+	 */
 	public String getSzExeFile() {
 		return mSzExeFile;
 	}
 
+	/**
+	 * Gets the identifier of the process that created this process (its parent
+	 * process).
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx">
+	 *      MSDN webpage#PROCESSENTRY32 structure</a>
+	 * 
+	 * @return The identifier of the process that created this process (its
+	 *         parent process)
+	 */
 	public int getTh32ParentProcessID() {
 		return mTh32ParentProcessID;
 	}
@@ -360,6 +528,30 @@ public final class Process {
 		return result;
 	}
 
+	/**
+	 * Reads data from an area of memory in this process. The entire area to be
+	 * read must be accessible or the operation fails.
+	 * 
+	 * @see <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms680553(v=vs.85).aspx">
+	 *      MSDN webpage#ReadProcessMemory function</a>
+	 * 
+	 * @param pAddress
+	 *            The address in this process from which to read. Before any
+	 *            data transfer occurs, the system verifies that all data at
+	 *            this address and memory of the specified size is accessible
+	 *            for read access, and if it is not accessible the function
+	 *            fails.
+	 * @param outputBuffer
+	 *            A pointer to a buffer that receives the contents from the
+	 *            address space
+	 * @param nSize
+	 *            The number of bytes to be read
+	 * @param outNumberOfBytesRead
+	 *            A pointer to a variable that receives the number of bytes
+	 *            transferred into the specified buffer. If outNumberOfBytesRead
+	 *            is <tt>null</tt>, the parameter is ignored.
+	 */
 	public void readProcessMemory(final int pAddress, final Pointer outputBuffer, final int nSize,
 			final IntByReference outNumberOfBytesRead) {
 		Kernel32Util.ReadProcessMemory(getHandle(), pAddress, outputBuffer, nSize, outNumberOfBytesRead);
