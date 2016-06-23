@@ -18,8 +18,10 @@ import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinNT.MEMORY_BASIC_INFORMATION;
 import com.sun.jna.ptr.IntByReference;
 
-import de.zabuza.memeaterbug.winapi.api.Process;
-import de.zabuza.memeaterbug.winapi.api.ProcessList;
+import de.zabuza.memeaterbug.util.Masks;
+import de.zabuza.memeaterbug.util.SystemProperties;
+import de.zabuza.memeaterbug.winapi.Process;
+import de.zabuza.memeaterbug.winapi.ProcessList;
 import de.zabuza.memeaterbug.winapi.jna.Kernel32;
 import de.zabuza.memeaterbug.winapi.jna.User32;
 
@@ -166,15 +168,16 @@ public final class Kernel32Util {
 	 *             If the operation was not successful
 	 */
 	public static boolean is64Bit(final HANDLE hProcess) throws Win32Exception {
-		if (System.getenv("PROCESSOR_ARCHITECTURE") == "x86") {
+		if (System.getenv(SystemProperties.PRC_ARCH) == Masks.PRC_ARCH_32BIT) {
 			return false;
 		}
-		boolean isWow64 = false;
+
+		IntByReference isWow64 = new IntByReference();
 		boolean success = Kernel32.INSTANCE.IsWow64Process(hProcess, isWow64);
 		if (!success) {
 			throw new Win32Exception(Native.getLastError());
 		}
-		return !isWow64;
+		return isWow64.getValue() == 0;
 	}
 
 	/**
@@ -252,7 +255,7 @@ public final class Kernel32Util {
 	 * @param hProcess
 	 *            A handle to the process with memory that is being read. The
 	 *            handle must have
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_READ
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_READ
 	 *            PROCESS_VM_READ} access to the process.
 	 * @param pAddress
 	 *            The base address in the specified process from which to read.
@@ -291,7 +294,7 @@ public final class Kernel32Util {
 	 * @param hProcess
 	 *            A handle to the process whose memory information is queried.
 	 *            The handle must have been opened with the
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_INFORMATION
 	 *            PROCESS_QUERY_INFORMATION} access right, which enables using
 	 *            the handle to read information from the process object.
 	 * @param lpAddress
@@ -324,9 +327,9 @@ public final class Kernel32Util {
 	 * @param process
 	 *            A handle to the process memory to be modified. The handle must
 	 *            have
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_WRITE
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_WRITE
 	 *            PROCESS_VM_WRITE} and
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_OPERATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_OPERATION
 	 *            PROCESS_VM_OPERATION} access to the process.
 	 * @param address
 	 *            A pointer to the base address in the specified process to
@@ -336,7 +339,8 @@ public final class Kernel32Util {
 	 *            not accessible, the function fails.
 	 * @param data
 	 *            A buffer that contains data to be written in the address space
-	 *            of the specified process.
+	 *            of the specified process. Read from left to right, i.e. from
+	 *            the lower to the higher indices.
 	 * @throws Win32Exception
 	 *             If the operation was not successful
 	 */
@@ -346,6 +350,46 @@ public final class Kernel32Util {
 
 		for (int i = 0; i < size; i++) {
 			toWrite.setByte(i, data[i]);
+		}
+
+		Kernel32Util.writeProcessMemory(process, address, toWrite, size, null);
+	}
+
+	/**
+	 * Writes data reversely to an area of memory in a specified process. The
+	 * entire area to be written to must be accessible or the operation fails.
+	 * 
+	 * @see <a href= <a href=
+	 *      "https://msdn.microsoft.com/en-us/library/ms681674(v=vs.85).aspx">
+	 *      MSDN webpage#WriteProcessMemory function</a>
+	 * @param process
+	 *            A handle to the process memory to be modified. The handle must
+	 *            have
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_WRITE
+	 *            PROCESS_VM_WRITE} and
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_OPERATION
+	 *            PROCESS_VM_OPERATION} access to the process.
+	 * @param address
+	 *            A pointer to the base address in the specified process to
+	 *            which data is written. Before data transfer occurs, the system
+	 *            verifies that all data in the base address and memory of the
+	 *            specified size is accessible for write access, and if it is
+	 *            not accessible, the function fails.
+	 * @param data
+	 *            A buffer that contains data to be written reversely in the
+	 *            address space of the specified process. Read from right to
+	 *            left, i.e. from the higher to the lower indices.
+	 * @throws Win32Exception
+	 *             If the operation was not successful
+	 */
+	public static void writeMemoryReversely(final HANDLE process, final long address, final byte[] data)
+			throws Win32Exception {
+		int size = data.length;
+		Memory toWrite = new Memory(size);
+
+		int lastIndex = size - 1;
+		for (int i = 0; i < size; i++) {
+			toWrite.setByte(i, data[lastIndex - i]);
 		}
 
 		Kernel32Util.writeProcessMemory(process, address, toWrite, size, null);
@@ -362,9 +406,9 @@ public final class Kernel32Util {
 	 * @param hProcess
 	 *            A handle to the process memory to be modified. The handle must
 	 *            have
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_WRITE
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_WRITE
 	 *            PROCESS_VM_WRITE} and
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_OPERATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_OPERATION
 	 *            PROCESS_VM_OPERATION} access to the process.
 	 * @param lpBaseAddress
 	 *            A pointer to the base address in the specified process to

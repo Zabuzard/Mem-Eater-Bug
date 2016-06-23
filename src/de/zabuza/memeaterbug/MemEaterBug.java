@@ -3,10 +3,11 @@ package de.zabuza.memeaterbug;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 
 import de.zabuza.memeaterbug.locale.ErrorMessages;
+import de.zabuza.memeaterbug.memory.MemManipulator;
 import de.zabuza.memeaterbug.util.Masks;
 import de.zabuza.memeaterbug.util.SystemProperties;
-import de.zabuza.memeaterbug.winapi.api.Process;
 import de.zabuza.memeaterbug.winapi.jna.util.User32Util;
+import de.zabuza.memeaterbug.winapi.Process;
 import de.zabuza.memeaterbug.winapi.jna.util.Kernel32Util;
 import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 
@@ -14,7 +15,11 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
  * Provides various methods for memory manipulation on Windows systems using
  * JNA. After creation it needs to be hooked to the given process, by using
  * {@link #hookProcess()}. Before shutdown the process handle should be closed
- * by using {@link #unhookProcess()}.
+ * by using {@link #unhookProcess()}.<br/>
+ * <br/>
+ * If using for 32-bit applications on a 64-bit system, you should use a 32-bit
+ * Java Runtime Environment to ensure proper execution. You may check this by
+ * using {@link #is64BitProcess()}.
  * 
  * @author Zabuza
  *
@@ -31,6 +36,11 @@ public final class MemEaterBug {
 	 * If the Mem-Eater-Bug is hooked to a process or not.
 	 */
 	private boolean mIsHooked;
+	/**
+	 * Memory manipulator for the current process handle, if hooked,
+	 * <tt>null</tt> else.
+	 */
+	private MemManipulator mMemManipulator;
 	/**
 	 * Handle to the current process, if hooked, <tt>null</tt> else.
 	 */
@@ -62,6 +72,7 @@ public final class MemEaterBug {
 
 		mIsHooked = false;
 		mProcessHandle = null;
+		mMemManipulator = null;
 
 		if (processId == 0) {
 			throw new IllegalArgumentException(ErrorMessages.PROCESS_NOT_FOUND);
@@ -105,20 +116,34 @@ public final class MemEaterBug {
 	}
 
 	/**
+	 * Gets an object for memory manipulation of the hooked process.
+	 * 
+	 * @return An object for memory manipulation of the hooked process.
+	 * @throws IllegalStateException
+	 *             If the Mem-Eater-Bug is not hooked to a process
+	 */
+	public MemManipulator getMemManipulator() throws IllegalStateException {
+		ensureIsHooked();
+		if (mMemManipulator == null) {
+			mMemManipulator = new MemManipulator(mProcessId, mProcessHandle);
+		}
+		return mMemManipulator;
+	}
+
+	/**
 	 * Hooks the Mem-Eater-Bug to the given process. After that, it is able to
 	 * interact with the process and, for example, manipulate its memory. Before
 	 * shutdown, {@link #unhookProcess()} should be used to free resources.<br/>
 	 * <br/>
 	 * It requests the following permissions for interaction with the process:
 	 * <ul>
-	 * <li>
-	 * {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 * <li>{@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_INFORMATION
 	 * PROCESS_QUERY_INFORMATION}</li>
-	 * <li>{@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_READ
+	 * <li>{@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_READ
 	 * PROCESS_VM_READ}</li>
-	 * <li>{@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_WRITE
+	 * <li>{@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_WRITE
 	 * PROCESS_VM_WRITE}</li>
-	 * <li>{@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_OPERATION
+	 * <li>{@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_OPERATION
 	 * PROCESS_VM_OPERATION}</li>
 	 * </ul>
 	 * 
@@ -169,9 +194,7 @@ public final class MemEaterBug {
 	 *             If the Mem-Eater-Bug is not hooked to a process
 	 */
 	public boolean is64BitProcess() {
-		if (!mIsHooked) {
-			throw new IllegalStateException(ErrorMessages.UNABLE_SINCE_NOT_HOOKED);
-		}
+		ensureIsHooked();
 		return mIs64BitProcess;
 	}
 
@@ -200,7 +223,21 @@ public final class MemEaterBug {
 			throw new IllegalStateException(ErrorMessages.PROCESS_UNABLE_TO_UNHOOK_SINCE_NOT_HOOKED);
 		}
 		mProcessHandle = null;
+		mMemManipulator = null;
 		mIsHooked = false;
+	}
+
+	/**
+	 * Ensures that the Mem-Eater-Bug is hooked to a process by
+	 * {@link #hookProcess()}.
+	 * 
+	 * @throws IllegalStateException
+	 *             If the Mem-Eater-Bug is not hooked to a process
+	 */
+	private void ensureIsHooked() throws IllegalStateException {
+		if (!mIsHooked) {
+			throw new IllegalStateException(ErrorMessages.UNABLE_SINCE_NOT_HOOKED);
+		}
 	}
 
 	/**

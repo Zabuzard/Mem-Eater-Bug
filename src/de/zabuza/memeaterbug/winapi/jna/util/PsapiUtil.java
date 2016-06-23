@@ -11,10 +11,10 @@ import com.sun.jna.platform.win32.WinDef.HMODULE;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 
-import de.zabuza.memeaterbug.winapi.api.Module;
+import de.zabuza.memeaterbug.memory.MemSize;
+import de.zabuza.memeaterbug.winapi.Process;
 import de.zabuza.memeaterbug.winapi.jna.Psapi;
 import de.zabuza.memeaterbug.winapi.jna.Psapi.LPMODULEINFO;
-import de.zabuza.memeaterbug.winapi.api.Process;
 
 /**
  * Provides various utility methods that use the JNA interface for Windows
@@ -80,7 +80,7 @@ public final class PsapiUtil {
 	 */
 	public static List<HMODULE> enumProcessModulesEx(final HANDLE hProcess, final Integer listFlag)
 			throws Win32Exception {
-		int moduleSize = Module.getSizeOfModule(hProcess);
+		int moduleSize = MemSize.getSizeOfModule(hProcess);
 		List<HMODULE> list = new LinkedList<HMODULE>();
 
 		HMODULE[] lphModule = new HMODULE[MODULE_BUFFER_AMOUNT * moduleSize];
@@ -147,9 +147,9 @@ public final class PsapiUtil {
 	 * @param hProcess
 	 *            A handle to the process that contains the module. The handle
 	 *            must have the
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_INFORMATION
 	 *            PROCESS_QUERY_INFORMATION} and
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_READ
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_READ
 	 *            PROCESS_VM_READ} access rights.
 	 * @param hModule
 	 *            A handle to the module. If this parameter is <tt>null</tt>,
@@ -179,9 +179,9 @@ public final class PsapiUtil {
 	 *            A handle to the process that contains the module.<br/>
 	 *            <br/>
 	 *            The handle must have the
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_INFORMATION
 	 *            PROCESS_QUERY_INFORMATION} and
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_READ
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_READ
 	 *            PROCESS_VM_READ} access rights.
 	 * @param hModule
 	 *            A handle to the module.
@@ -198,6 +198,25 @@ public final class PsapiUtil {
 			throw new Win32Exception(Native.getLastError());
 		}
 		return lpmodinfo;
+	}
+
+	/**
+	 * Gets a process wrapper for the process given by its id.
+	 * 
+	 * @param processId
+	 *            Id of the process to get the wrapper for
+	 * @return Process wrapper for the process given by its id or <tt>null</tt>
+	 *         if not found
+	 */
+	public static Process getProcessById(final int processId) {
+		Iterator<Process> processes = Kernel32Util.getProcessList().iterator();
+		while (processes.hasNext()) {
+			Process process = processes.next();
+			if (process.getPid() == processId) {
+				return process;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -232,9 +251,9 @@ public final class PsapiUtil {
 	 *      MSDN webpage#GetProcessImageFileName function</a>
 	 * @param hProcess
 	 *            A handle to the process. The handle must have the
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_INFORMATION
 	 *            PROCESS_QUERY_INFORMATION} or
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_LIMITED_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_LIMITED_INFORMATION
 	 *            PROCESS_QUERY_LIMITED_INFORMATION} access right.
 	 * @return The name of the executable file for the specified process.
 	 * @throws Win32Exception

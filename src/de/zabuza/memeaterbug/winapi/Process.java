@@ -1,4 +1,4 @@
-package de.zabuza.memeaterbug.winapi.api;
+package de.zabuza.memeaterbug.winapi;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -555,5 +555,23 @@ public final class Process {
 	public void readProcessMemory(final int pAddress, final Pointer outputBuffer, final int nSize,
 			final IntByReference outNumberOfBytesRead) {
 		Kernel32Util.readProcessMemory(getHandle(), pAddress, outputBuffer, nSize, outNumberOfBytesRead);
+	}
+
+	/**
+	 * Sets the handle to this process. It must be ensured that the handle
+	 * belongs to the same process that was used at construction of this object.
+	 * It must also be ensured that it has all necessary access rights.<br/>
+	 * <br/>
+	 * If the process already contained another handle object, it will
+	 * automatically closed to free resources.
+	 * 
+	 * @param processHandle
+	 *            Handle to this process
+	 */
+	public void setHandle(final HANDLE processHandle) {
+		if (mHandleCache != null) {
+			Kernel32Util.closeHandle(mHandleCache);
+		}
+		mHandleCache = processHandle;
 	}
 }

@@ -179,9 +179,9 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 *            A handle to the process that contains the module.<br/>
 	 *            <br/>
 	 *            The handle must have the
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_INFORMATION
 	 *            PROCESS_QUERY_INFORMATION} and
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_READ
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_READ
 	 *            PROCESS_VM_READ} access rights.
 	 * @param hModule
 	 *            A handle to the module.
@@ -207,9 +207,9 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 * 
 	 * @param hProcess
 	 *            A handle to the process. The handle must have the
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_INFORMATION
 	 *            PROCESS_QUERY_INFORMATION} or
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_LIMITED_INFORMATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_QUERY_LIMITED_INFORMATION
 	 *            PROCESS_QUERY_LIMITED_INFORMATION} access right.
 	 * @param lpImageFileName
 	 *            A pointer to a buffer that receives the full path to the

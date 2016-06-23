@@ -12,6 +12,10 @@ public final class Masks {
 	 * system.
 	 */
 	public static final String OS_NAME_WINDOWS = "windows";
+	/**
+	 * Search mask for a 32-bit processor architecture.
+	 */
+	public static final String PRC_ARCH_32BIT = "x86";
 
 	/**
 	 * Utility class. No implementation.

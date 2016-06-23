@@ -20,35 +20,6 @@ public interface Kernel32 extends com.sun.jna.platform.win32.Kernel32 {
 	public Kernel32 INSTANCE = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class, W32APIOptions.DEFAULT_OPTIONS);
 
 	/**
-	 * Determines whether the specified process is running under <a href=
-	 * "https://msdn.microsoft.com/en-us/library/windows/desktop/aa384249(v=vs.85).aspx">
-	 * WOW64</a>.
-	 * 
-	 * @see <a href=
-	 *      "https://msdn.microsoft.com/en-us/library/ms684139(v=vs.85).aspx">
-	 *      MSDN webpage#IsWow64Process function</a>
-	 * 
-	 * @param hProcess
-	 *            A handle to the process. The handle must have the
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_INFORMATION
-	 *            PROCESS_QUERY_INFORMATION} or
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_QUERY_LIMITED_INFORMATION
-	 *            PROCESS_QUERY_LIMITED_INFORMATION} access right.
-	 * @param Wow64Process
-	 *            A pointer to a value that is set to <tt>true</tt> if the
-	 *            process is running under WOW64. If the process is running
-	 *            under 32-bit Windows, the value is set to <tt>false</tt>. If
-	 *            the process is a 64-bit application running under 64-bit
-	 *            Windows, the value is also set to <tt>false</tt>.
-	 * @return If the function succeeds, the return value is a nonzero value.
-	 *         <br/>
-	 *         <br/>
-	 *         If the function fails, the return value is zero. To get extended
-	 *         error information, call {@link #Native.GetLastError()}.
-	 */
-	public boolean IsWow64Process(final HANDLE hProcess, final boolean Wow64Process);
-
-	/**
 	 * Reads data from an area of memory in a specified process. The entire area
 	 * to be read must be accessible or the operation fails.
 	 * 
@@ -59,7 +30,7 @@ public interface Kernel32 extends com.sun.jna.platform.win32.Kernel32 {
 	 * @param hProcess
 	 *            A handle to the process with memory that is being read. The
 	 *            handle must have
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_READ
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_READ
 	 *            PROCESS_VM_READ} access to the process.
 	 * @param lpBaseAddress
 	 *            The base address in the specified process from which to read.
@@ -100,9 +71,9 @@ public interface Kernel32 extends com.sun.jna.platform.win32.Kernel32 {
 	 * @param hProcess
 	 *            A handle to the process memory to be modified. The handle must
 	 *            have
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_WRITE
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_WRITE
 	 *            PROCESS_VM_WRITE} and
-	 *            {@link de.zabuza.memeaterbug.winapi.api.Process#PROCESS_VM_OPERATION
+	 *            {@link de.zabuza.memeaterbug.winapi.Process#PROCESS_VM_OPERATION
 	 *            PROCESS_VM_OPERATION} access to the process.
 	 * @param lpBaseAddress
 	 *            The base address in the specified process to which data is

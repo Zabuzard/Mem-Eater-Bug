@@ -1,4 +1,4 @@
-package de.zabuza.memeaterbug.winapi.api;
+package de.zabuza.memeaterbug.winapi;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,8 +9,8 @@ import java.util.Map;
 import com.sun.jna.platform.win32.WinDef.HWND;
 
 /**
- * List that holds {@link de.zabuza.memeaterbug.winapi.api.Process Process}
- * objects. Implemented as linked and hashed map.
+ * List that holds {@link de.zabuza.memeaterbug.winapi.Process Process} objects.
+ * Implemented as linked and hashed map.
  * 
  * @author Zabuza
  *
