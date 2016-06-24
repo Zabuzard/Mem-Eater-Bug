@@ -2,6 +2,8 @@ package de.zabuza.memeaterbug;
 
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 
+import de.zabuza.memeaterbug.exceptions.NotHookedException;
+import de.zabuza.memeaterbug.injection.Injector;
 import de.zabuza.memeaterbug.locale.ErrorMessages;
 import de.zabuza.memeaterbug.memory.MemManipulator;
 import de.zabuza.memeaterbug.util.Masks;
@@ -26,6 +28,10 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
  */
 public final class MemEaterBug {
 
+	/**
+	 * Injector for the current process handle, if hooked, <tt>null</tt> else.
+	 */
+	private Injector mInjector;
 	/**
 	 * If the current process runs in an 64 bit environment or not. Can only be
 	 * accessed after the the Mem-Eater-Bug was hooked to a process using
@@ -73,6 +79,7 @@ public final class MemEaterBug {
 		mIsHooked = false;
 		mProcessHandle = null;
 		mMemManipulator = null;
+		mInjector = null;
 
 		if (processId == 0) {
 			throw new IllegalArgumentException(ErrorMessages.PROCESS_NOT_FOUND);
@@ -113,6 +120,21 @@ public final class MemEaterBug {
 	 */
 	public MemEaterBug(final String processClassName, final String windowTitle) {
 		this(User32Util.getWindowThreadProcessIdByClassAndTitle(processClassName, windowTitle).getValue());
+	}
+
+	/**
+	 * Gets an object for injecting code into the hooked process.
+	 * 
+	 * @return An object for injecting code into the hooked process.
+	 * @throws IllegalStateException
+	 *             If the Mem-Eater-Bug is not hooked to a process
+	 */
+	public Injector getInjector() throws IllegalStateException {
+		ensureIsHooked();
+		if (mInjector == null) {
+			mInjector = new Injector(mProcessId, mProcessHandle);
+		}
+		return mInjector;
 	}
 
 	/**
@@ -224,6 +246,7 @@ public final class MemEaterBug {
 		}
 		mProcessHandle = null;
 		mMemManipulator = null;
+		mInjector = null;
 		mIsHooked = false;
 	}
 
@@ -236,7 +259,7 @@ public final class MemEaterBug {
 	 */
 	private void ensureIsHooked() throws IllegalStateException {
 		if (!mIsHooked) {
-			throw new IllegalStateException(ErrorMessages.UNABLE_SINCE_NOT_HOOKED);
+			throw new NotHookedException(ErrorMessages.UNABLE_SINCE_NOT_HOOKED);
 		}
 	}
 

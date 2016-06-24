@@ -40,6 +40,16 @@ public final class ErrorMessages {
 	 * process.
 	 */
 	public static final String UNABLE_SINCE_NOT_HOOKED = "Unable to execute since not hooked to a process. First hook, then try again.";
+	/**
+	 * Thrown when an {@link de.zabuza.memeaterbug.injection.Injector Injector}
+	 * method could not inject an agent jar file into a target jar file.
+	 */
+	public static final String UNABLE_TO_INJECT_JAR_INTO_JAR = "Unable to inject the agent jar into the target jar. Ensure the target process is a jar-file and you have all needed permissions. Also make sure the agent jar specifies an agentmain-method and has set the Agent-Class key accordingly.";
+	/**
+	 * Thrown when an {@link de.zabuza.memeaterbug.injection.Injector Injector}
+	 * method could not inject an agent jar file into a target jar file.
+	 */
+	public static final String UNABLE_TO_INJECT_LIBRARY_INTO_JAR = "Unable to inject the agent library into the target jar. Ensure the target process is a jar-file and you have all needed permissions. Also make sure the agent library specifies all needed agent-methods via the native agent interface.";
 
 	/**
 	 * Utility class. No implementation.
