@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Graphics;
+import java.lang.reflect.Field;
 
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
+import javax.swing.JRootPane;
 
 /**
  * Hack for the popular game Space Invaders that displays various information on
@@ -22,9 +24,76 @@ import javax.swing.JProgressBar;
  */
 public final class SpaceInvadersInjection extends Thread {
 	/**
+	 * Overlay panel that gets placed on top of the JFrame. It displays
+	 * information of the game which is not there by default.
+	 * 
+	 * @author Zabuza
+	 *
+	 */
+	private final class GameOverlayPanel extends JPanel {
+
+		/**
+		 * Serial version UID.
+		 */
+		private static final long serialVersionUID = 1L;
+		/**
+		 * Amount of remaining aliens. Gets updated by
+		 * {@link #updateRemainingAliens(int)}.
+		 */
+		private int mRemainingAliens;
+
+		/**
+		 * Creates a new overlay panel whose content can be updated with
+		 * {@link #updateRemainingAliens(int)}.
+		 */
+		public GameOverlayPanel() {
+			setBackground(Color.BLACK);
+			mRemainingAliens = -1;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+		 */
+		@Override
+		public void paintComponent(final Graphics g) {
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, getWidth(), getHeight());
+
+			g.setColor(Color.WHITE);
+			g.drawString("Remaining Aliens: " + mRemainingAliens, 5, getHeight() / 2);
+		}
+
+		/**
+		 * Updates the amount of remaining aliens which gets displayed on this
+		 * panel.
+		 * 
+		 * @param remainingAliens
+		 */
+		public void updateRemainingAliens(final int remainingAliens) {
+			if (mRemainingAliens != remainingAliens) {
+				mRemainingAliens = remainingAliens;
+				repaint();
+			}
+		}
+	}
+
+	/**
+	 * The full name of the game class to manipulate.
+	 */
+	private static final String GAME_CLASS_NAME = "org.newdawn.spaceinvaders.Game";
+	/**
+	 * The name of the private field in the game which holds the amount of
+	 * remaining aliens.
+	 */
+	private static final String GAME_REMAINING_ALIEN_FIELD = "alienCount";
+
+	/**
 	 * Timeout to wait in the logic loop, in milliseconds.
 	 */
 	private static final int TIMEOUT = 50;
+
 	/**
 	 * Title of the JFrame to manipulate.
 	 */
@@ -36,7 +105,6 @@ public final class SpaceInvadersInjection extends Thread {
 	 */
 	public SpaceInvadersInjection() {
 		this(null);
-		// TODO Rename everything, we inject SwingApp, not SpaceInvaders
 	}
 
 	/**
@@ -68,68 +136,95 @@ public final class SpaceInvadersInjection extends Thread {
 			}
 		}
 
-		// Frame found, manipulate the content
-		if (gameFrame != null) {
-			GlassPane glassPane = new GlassPane();
-			gameFrame.setGlassPane(glassPane);
-			glassPane.setOpaque(false);
-			glassPane.setVisible(true);
+		GameOverlayPanel overlay = null;
+		Component gameComponent = null;
 
-			// Find the JProgressBar of the App
-			Component[] components = gameFrame.getContentPane().getComponents();
-			JProgressBar bar = null;
-			for (Component component : components) {
-				if (component instanceof JProgressBar) {
-					bar = (JProgressBar) component;
+		Class<?> gameClass = null;
+		try {
+			ClassLoader classLoader = SpaceInvadersInjection.class.getClassLoader();
+			if (classLoader == null) {
+				throw new IllegalStateException("Can not find ClassLoader.");
+			}
+			gameClass = classLoader.loadClass(GAME_CLASS_NAME);
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
+
+		boolean foundGameElement = false;
+
+		// Frame found, find the LayeredPane which holds the content
+		if (gameFrame != null) {
+			for (Component compOne : gameFrame.getComponents()) {
+				if (compOne instanceof JRootPane) {
+					JRootPane rootPane = (JRootPane) compOne;
+					for (Component compTwo : rootPane.getComponents()) {
+						if (compTwo instanceof JLayeredPane) {
+							JLayeredPane rootLayeredPane = (JLayeredPane) compTwo;
+							for (Component compThree : rootLayeredPane.getComponents()) {
+								if (compThree instanceof JPanel) {
+									JPanel rootPanel = (JPanel) compThree;
+									for (Component compFour : rootPanel.getComponents()) {
+										if (compFour instanceof JLayeredPane) {
+											// Here is the content of the frame
+											JLayeredPane layeredPane = (JLayeredPane) compFour;
+											// Search for the games content
+											// canvas
+											for (Component compFive : layeredPane.getComponents()) {
+												if (gameClass != null && gameClass.isInstance(compFive)) {
+													gameComponent = compFive;
+
+													// Add the overlay
+													overlay = new GameOverlayPanel();
+													overlay.setBounds(0, 0, gameComponent.getWidth(), 40);
+													overlay.setOpaque(true);
+													layeredPane.add(overlay, new Integer(1), 0);
+
+													foundGameElement = true;
+												}
+												if (foundGameElement) {
+													break;
+												}
+											}
+										}
+										if (foundGameElement) {
+											break;
+										}
+									}
+								}
+								if (foundGameElement) {
+									break;
+								}
+							}
+						}
+						if (foundGameElement) {
+							break;
+						}
+					}
+				}
+				if (foundGameElement) {
 					break;
 				}
 			}
-			if (bar != null) {
-				// Logic loop
-				while (true) {
-					// Pass the value to the glass pane
-					glassPane.updateProgress(bar.getValue());
-					try {
-						sleep(TIMEOUT);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+			gameFrame.pack();
+		}
+
+		// Logic loop
+		while (true) {
+			// Update the value and pass it to the overlay
+			try {
+				// Access the private field of the game object
+				if (gameClass != null) {
+					Field field = gameClass.getDeclaredField(GAME_REMAINING_ALIEN_FIELD);
+					field.setAccessible(true);
+					int remainingAliens = field.getInt(gameComponent);
+					overlay.updateRemainingAliens(remainingAliens);
 				}
+
+				sleep(TIMEOUT);
+			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException
+					| InterruptedException e) {
+				e.printStackTrace();
 			}
-		}
-	}
-
-	/**
-	 * Glass pane that gets placed on top of the JFrame to manipulate.
-	 * 
-	 * @author Zabuza
-	 *
-	 */
-	private class GlassPane extends JPanel {
-		/**
-		 * Serial UID.
-		 */
-		private static final long serialVersionUID = 1L;
-		private int mProgress = 0;
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
-		 */
-		@Override
-		public void paintComponent(Graphics g) {
-			g.setColor(new Color(0, 0, 0, 50));
-			g.fillRect(3, 70, 100, 100);
-			// TODO Do something with the progress value
-		}
-		
-		/**
-		 * Updates the progress value to display.
-		 * @param progress Progress value
-		 */
-		public void updateProgress(final int progress) {
-			mProgress = progress;
 		}
 	}
 }

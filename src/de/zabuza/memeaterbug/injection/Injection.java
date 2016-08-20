@@ -59,7 +59,7 @@ public final class Injection {
 
 			String threadClassName = argsArray[0];
 			Class<?> threadClass = Class.forName(threadClassName);
-			if (Thread.class.isAssignableFrom(threadClass)) {
+			if (threadClass.isAssignableFrom(Thread.class)) {
 				throw new IllegalArgumentException(ERROR_NO_THREAD);
 			}
 
