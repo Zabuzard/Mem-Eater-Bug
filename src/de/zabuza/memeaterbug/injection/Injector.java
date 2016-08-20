@@ -22,6 +22,11 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 public final class Injector {
 
 	/**
+	 * Masks that separates the passed arguments.
+	 */
+	public static final String ARG_SEPARATOR = ",";
+
+	/**
 	 * Name of the attach library that is used for attaching to a virtual
 	 * machine.
 	 */
@@ -62,33 +67,102 @@ public final class Injector {
 	}
 
 	/**
-	 * Loads the native attach library into the built path. It is used for
-	 * attaching to a virtual machine.
+	 * Injects a given agent jar-file into the hooked process. The hooked
+	 * process also needs to be a jar-file. The agent jar-File should use the
+	 * {@link Injection} agent. It will automatically create and start an
+	 * instance of the given custom Thread object. Thus this method immediately
+	 * returns once the thread has started.
+	 * 
+	 * @param pathToAgentJar
+	 *            Path to the agent jar-file to inject. The agent jar-file needs
+	 *            to specify an agentmain-method and must have the Agent-Class
+	 *            key accordingly. A good solution is to use the
+	 *            {@link Injection} agent for that and provide a custom Thread
+	 *            which gets automatically called by {@link Injection}.
+	 * @param threadClassName
+	 *            The full class name of the thread object that gets
+	 *            automatically started by the injection agent, assuming
+	 *            {@link Injection} gets used.
+	 * @throws UnableToInjectException
+	 *             If the operation was unable to inject the agent jar-file into
+	 *             the target jar-file
 	 */
-	private void loadAttachLibrary() {
-		System.loadLibrary(ATTACH_LIBRARY_NAME);
+	public void injectJarIntoJar(final String pathToAgentJar, final String threadClassName)
+			throws UnableToInjectException {
+		injectJarIntoJar(pathToAgentJar, threadClassName, null);
 	}
 
 	/**
 	 * Injects a given agent jar-file into the hooked process. The hooked
-	 * process also needs to be a jar-file.
+	 * process also needs to be a jar-file. The agent jar-File should use the
+	 * {@link Injection} agent. It will automatically create and start an
+	 * instance of the given custom Thread object. Thus this method immediately
+	 * returns once the thread has started. If the given Thread provides a
+	 * constructor that accepts a String-array, additional arguments can be
+	 * passed.
+	 * 
+	 * @param pathToAgentJar
+	 *            Path to the agent jar-file to inject. The agent jar-file needs
+	 *            to specify an agentmain-method and must have the Agent-Class
+	 *            key accordingly. A good solution is to use the
+	 *            {@link Injection} agent for that and provide a custom Thread
+	 *            which gets automatically called by {@link Injection}.
+	 * @param threadClassName
+	 *            The full class name of the thread object that gets
+	 *            automatically started by the injection agent, assuming
+	 *            {@link Injection} gets used. The injector will pass the given
+	 *            additional arguments if the Thread object has a constructor
+	 *            that accepts a String-array, else the default constructor gets
+	 *            used.
+	 * @param additionalArgs
+	 *            Additional arguments to pass to the jar-File. They get
+	 *            separated by {@link #ARG_SEPARATOR}.
+	 * @throws UnableToInjectException
+	 *             If the operation was unable to inject the agent jar-file into
+	 *             the target jar-file
+	 */
+	public void injectJarIntoJar(final String pathToAgentJar, final String threadClassName,
+			final String[] additionalArgs) throws UnableToInjectException {
+		try {
+			StringBuilder argsToPass = new StringBuilder();
+			if (threadClassName != null && threadClassName.length() > 0) {
+				argsToPass.append(threadClassName).append(ARG_SEPARATOR);
+			}
+			String processIdAsString = String.valueOf(mProcess.getPid());
+			argsToPass.append(processIdAsString);
+			if (additionalArgs != null && additionalArgs.length > 0) {
+				for (String addtionalArg : additionalArgs) {
+					argsToPass.append(ARG_SEPARATOR).append(addtionalArg);
+				}
+			}
+
+			VirtualMachine vm = VirtualMachine.attach(processIdAsString);
+			vm.loadAgent(pathToAgentJar, argsToPass.toString());
+			vm.detach();
+		} catch (AttachNotSupportedException | AgentLoadException | AgentInitializationException | IOException e) {
+			throw new UnableToInjectException(ErrorMessages.UNABLE_TO_INJECT_JAR_INTO_JAR);
+		}
+	}
+
+	/**
+	 * Injects a given agent jar-file into the hooked process. The hooked
+	 * process also needs to be a jar-file. The method returns once the
+	 * agentmain-method of the injected agent finishes.
 	 * 
 	 * @param pathToAgentJar
 	 *            Path to the agent jar-file to inject. The agent jar-file needs
 	 *            to specify an agentmain-method and must have the Agent-Class
 	 *            key accordingly.
+	 * @param additionalArgs
+	 *            Additional arguments to pass to the jar-File. They get
+	 *            separated by {@link #ARG_SEPARATOR}.
 	 * @throws UnableToInjectException
 	 *             If the operation was unable to inject the agent jar-file into
 	 *             the target jar-file
 	 */
-	public void injectJarIntoJar(final String pathToAgentJar) throws UnableToInjectException {
-		try {
-			VirtualMachine vm = VirtualMachine.attach("" + mProcess.getPid());
-			vm.loadAgent(pathToAgentJar);
-			vm.detach();
-		} catch (AttachNotSupportedException | AgentLoadException | AgentInitializationException | IOException e) {
-			throw new UnableToInjectException(ErrorMessages.UNABLE_TO_INJECT_JAR_INTO_JAR);
-		}
+	public void injectJarIntoJar(final String pathToAgentJar, final String[] additionalArgs)
+			throws UnableToInjectException {
+		injectJarIntoJar(pathToAgentJar, null, additionalArgs);
 	}
 
 	/**
@@ -105,11 +179,20 @@ public final class Injector {
 	 */
 	public void injectLibraryIntoJar(final String pathToAgentLibrary) throws UnableToInjectException {
 		try {
-			VirtualMachine vm = VirtualMachine.attach("" + mProcess.getPid());
+			String processIdAsString = String.valueOf(mProcess.getPid());
+			VirtualMachine vm = VirtualMachine.attach(processIdAsString);
 			vm.loadAgentLibrary(pathToAgentLibrary);
 			vm.detach();
 		} catch (AttachNotSupportedException | AgentLoadException | AgentInitializationException | IOException e) {
 			throw new UnableToInjectException(ErrorMessages.UNABLE_TO_INJECT_LIBRARY_INTO_JAR);
 		}
+	}
+
+	/**
+	 * Loads the native attach library into the built path. It is used for
+	 * attaching to a virtual machine.
+	 */
+	private void loadAttachLibrary() {
+		System.loadLibrary(ATTACH_LIBRARY_NAME);
 	}
 }
