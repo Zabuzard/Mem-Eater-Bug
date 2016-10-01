@@ -15,7 +15,7 @@ import com.sun.jna.ptr.IntByReference;
  * notifications from the operating system), displaying text in a window, and
  * displaying message boxes.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public interface User32 extends com.sun.jna.platform.win32.User32 {

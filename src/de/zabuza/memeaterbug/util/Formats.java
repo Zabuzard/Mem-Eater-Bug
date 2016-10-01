@@ -3,7 +3,7 @@ package de.zabuza.memeaterbug.util;
 /**
  * Utility class that provides format patterns.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Formats {

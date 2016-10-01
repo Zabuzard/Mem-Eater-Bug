@@ -4,7 +4,7 @@ package de.zabuza.memeaterbug.util;
  * Utility class that provides system property keys for usage with
  * {@link System#getProperty(String)} or similar methods.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class SystemProperties {

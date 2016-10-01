@@ -12,7 +12,7 @@ import com.sun.jna.platform.win32.WinDef.HWND;
  * List that holds {@link de.zabuza.memeaterbug.winapi.Process Process} objects.
  * Implemented as linked and hashed map.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public class ProcessList implements Iterable<Process> {

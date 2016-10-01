@@ -7,7 +7,7 @@ import de.zabuza.memeaterbug.injection.Injector;
  * Hack for the popular game Space Invaders that displays various information on
  * the game screen by jar-injection.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class SpaceInvadersInjector {

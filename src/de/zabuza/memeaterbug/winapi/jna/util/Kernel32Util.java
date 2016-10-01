@@ -31,7 +31,7 @@ import de.zabuza.memeaterbug.winapi.jna.User32;
  * as memory management, input/output (I/O) operations, process and thread
  * creation, and synchronization functions.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Kernel32Util {

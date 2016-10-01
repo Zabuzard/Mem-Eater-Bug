@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
  * Remark: Some constants are duplicated here to easily create an independent
  * jar that just contains this class.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Injection {

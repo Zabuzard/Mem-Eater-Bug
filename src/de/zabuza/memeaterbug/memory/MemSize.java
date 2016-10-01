@@ -10,7 +10,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.Kernel32Util;
  * Provides methods for getting the size of different data types that are used
  * at memory interaction.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class MemSize {

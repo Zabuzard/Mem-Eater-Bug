@@ -7,7 +7,7 @@ import de.zabuza.memeaterbug.memory.MemManipulator;
  * Hack for the popular game Solitaire that allows arbitrary changes of the user
  * score.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class SoliScorer {

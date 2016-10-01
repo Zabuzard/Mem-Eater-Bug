@@ -19,7 +19,7 @@ import com.sun.jna.platform.win32.WinNT.TOKEN_PRIVILEGES;
  * shutdown/restart the system (or abort), start/stop/create a Windows service
  * or manage user accounts.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Advapi32Util {

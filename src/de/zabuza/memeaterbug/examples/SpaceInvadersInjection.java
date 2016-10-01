@@ -19,7 +19,7 @@ import javax.swing.JRootPane;
  * {@link de.zabuza.memeaterbug.injection.Injection Injection} after injecting
  * the Space Invaders jar-file.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class SpaceInvadersInjection extends Thread {
@@ -27,7 +27,7 @@ public final class SpaceInvadersInjection extends Thread {
 	 * Overlay panel that gets placed on top of the JFrame. It displays
 	 * information of the game which is not there by default.
 	 * 
-	 * @author Zabuza
+	 * @author Zabuza {@literal <zabuza.dev@gmail.com>}
 	 *
 	 */
 	private final class GameOverlayPanel extends JPanel {

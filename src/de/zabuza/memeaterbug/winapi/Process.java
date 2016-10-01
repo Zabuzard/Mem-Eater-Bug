@@ -30,7 +30,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.User32Util;
  *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
  *      webpage#PROCESSENTRY32 structure</a>
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Process {

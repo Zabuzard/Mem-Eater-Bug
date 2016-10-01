@@ -4,7 +4,7 @@ package de.zabuza.memeaterbug.exceptions;
  * Thrown when an {@link de.zabuza.memeaterbug.injection.Injector Injector}
  * method could not inject code into the given process.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class UnableToInjectException extends RuntimeException {

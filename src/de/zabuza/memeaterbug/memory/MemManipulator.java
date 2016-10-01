@@ -15,7 +15,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 /**
  * Provides various methods for memory manipulation of a given process.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class MemManipulator {

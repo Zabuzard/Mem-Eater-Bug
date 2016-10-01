@@ -8,7 +8,7 @@ import com.sun.jna.Pointer;
  * API that allows applications to access functions provided by the operating
  * system shell, and to change and enhance it.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public interface Shell32 extends com.sun.jna.platform.win32.Shell32 {

@@ -10,7 +10,7 @@ import com.sun.jna.win32.W32APIOptions;
  * the Win32 base APIs, such as memory management, input/output (I/O)
  * operations, process and thread creation, and synchronization functions.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public interface Kernel32 extends com.sun.jna.platform.win32.Kernel32 {

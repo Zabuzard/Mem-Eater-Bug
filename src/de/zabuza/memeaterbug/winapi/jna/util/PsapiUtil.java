@@ -22,7 +22,7 @@ import de.zabuza.memeaterbug.winapi.jna.Psapi.LPMODULEINFO;
  * Psapi is a helper library that makes it easier to obtain information about
  * processes and device drivers.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class PsapiUtil {

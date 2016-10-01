@@ -3,7 +3,7 @@ package de.zabuza.memeaterbug.util;
 /**
  * Utility class that provides patterns as search masks.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Masks {

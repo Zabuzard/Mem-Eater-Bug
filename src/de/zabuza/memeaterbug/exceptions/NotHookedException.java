@@ -5,7 +5,7 @@ package de.zabuza.memeaterbug.exceptions;
  * {@link de.zabuza.memeaterbug.MemEaterBug MemEaterBug} was not hooked to a
  * process.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class NotHookedException extends RuntimeException {

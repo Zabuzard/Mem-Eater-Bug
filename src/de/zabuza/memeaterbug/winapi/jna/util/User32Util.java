@@ -32,7 +32,7 @@ import com.sun.jna.platform.win32.WinUser;
  * user input such as mouse and keyboard events, but also notifications from the
  * operating system), displaying text in a window, and displaying message boxes.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class User32Util {

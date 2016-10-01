@@ -20,7 +20,7 @@ import com.sun.jna.win32.W32APIOptions;
  *      "https://msdn.microsoft.com/en-us/library/ms684884(v=vs.85).aspx"> MSDN
  *      webpage#Process Status API</a>
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public interface Psapi extends com.sun.jna.platform.win32.Psapi {
@@ -31,7 +31,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 *      "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx">
 	 *      MSDN webpage#MODULEINFO structure</a>
 	 * 
-	 * @author Zabuza
+	 * @author Zabuza {@literal <zabuza.dev@gmail.com>}
 	 *
 	 */
 	public static final class LPMODULEINFO extends Structure {

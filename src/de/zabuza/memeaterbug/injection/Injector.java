@@ -16,7 +16,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 /**
  * Provides various methods for injecting code into a given process.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Injector {

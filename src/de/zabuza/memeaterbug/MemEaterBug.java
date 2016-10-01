@@ -23,7 +23,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
  * Java Runtime Environment to ensure proper execution. You may check this by
  * using {@link #is64BitProcess()}.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class MemEaterBug {

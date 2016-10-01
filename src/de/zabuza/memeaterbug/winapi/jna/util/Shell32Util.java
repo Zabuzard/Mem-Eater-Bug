@@ -11,7 +11,7 @@ import de.zabuza.memeaterbug.winapi.jna.Shell32;
  * to access functions provided by the operating system shell, and to change and
  * enhance it.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Shell32Util {

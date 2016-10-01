@@ -14,7 +14,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
  *      "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx"> MSDN
  *      webpage#MODULEINFO structure</a>
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
 public final class Module {

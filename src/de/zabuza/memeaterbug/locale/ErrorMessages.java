@@ -3,7 +3,7 @@ package de.zabuza.memeaterbug.locale;
 /**
  * Utility class that provides error messages for the Mem-Eater-Bug.
  * 
- * @author Zabuza
+ * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  * 
  */
 public final class ErrorMessages {
