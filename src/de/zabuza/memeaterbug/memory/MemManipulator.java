@@ -88,7 +88,7 @@ public final class MemManipulator {
 	 *         the given starting address
 	 */
 	public long findDynAddress(final int[] offsets, final long startingAddress) {
-		int size = Pointer.SIZE;
+		final int size = Pointer.SIZE;
 		Memory pTemp = new Memory(size);
 		long pointerAddress = -1;
 
@@ -123,7 +123,7 @@ public final class MemManipulator {
 	 * @return The integer read from the given address.
 	 */
 	public int readInt(final long address) {
-		Memory value = readMemory(address, MemSize.getIntSize());
+		final Memory value = readMemory(address, MemSize.getIntSize());
 		return value.getInt(0);
 	}
 
@@ -151,7 +151,7 @@ public final class MemManipulator {
 	 * @return The string read from the given address
 	 */
 	public String readString(final long address, final int size) {
-		Memory output = Kernel32Util.readMemory(this.mProcess.getHandle(), address, size);
+		final Memory output = Kernel32Util.readMemory(this.mProcess.getHandle(), address, size);
 		return output.getString(0);
 	}
 
@@ -175,7 +175,7 @@ public final class MemManipulator {
 		if (!Charset.availableCharsets().keySet().contains(encoding)) {
 			throw new UnsupportedEncodingException();
 		}
-		Memory output = Kernel32Util.readMemory(this.mProcess.getHandle(), address, sizeOfOneChar * length);
+		final Memory output = Kernel32Util.readMemory(this.mProcess.getHandle(), address, sizeOfOneChar * length);
 		return output.getString(0, encoding);
 	}
 
@@ -188,7 +188,7 @@ public final class MemManipulator {
 	 *            The value to write
 	 */
 	public void writeInt(final long address, final int valueToWrite) {
-		byte[] bytesToWriteReversed = ByteBuffer.allocate(MemSize.getIntSize()).putInt(valueToWrite).array();
+		final byte[] bytesToWriteReversed = ByteBuffer.allocate(MemSize.getIntSize()).putInt(valueToWrite).array();
 		writeMemoryReversely(address, bytesToWriteReversed);
 	}
 

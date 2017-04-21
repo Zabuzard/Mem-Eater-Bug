@@ -166,11 +166,11 @@ public final class Module {
 	private void extractModuleInformation() {
 		if (this.mEntryPoint == null) {
 			try {
-				LPMODULEINFO x = PsapiUtil.getModuleInformation(this.mHProcess, this.mHModule);
+				final LPMODULEINFO x = PsapiUtil.getModuleInformation(this.mHProcess, this.mHModule);
 				this.mLpBaseOfDll = x.lpBaseOfDll;
 				this.mSizeOfImage = x.SizeOfImage;
 				this.mEntryPoint = x.EntryPoint;
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}

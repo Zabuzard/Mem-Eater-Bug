@@ -35,7 +35,7 @@ public final class Advapi32Util {
 	 *             If the method was not successful
 	 */
 	public static void enableDebugPrivilege(final HANDLE hProcess) throws Win32Exception {
-		HANDLEByReference hToken = new HANDLEByReference();
+		final HANDLEByReference hToken = new HANDLEByReference();
 		Win32Exception winException = null;
 		try {
 			if (!Advapi32.INSTANCE.OpenProcessToken(hProcess, WinNT.TOKEN_QUERY | WinNT.TOKEN_ADJUST_PRIVILEGES,
@@ -43,21 +43,21 @@ public final class Advapi32Util {
 				throw new Win32Exception(Native.getLastError());
 			}
 
-			LUID luid = new LUID();
+			final LUID luid = new LUID();
 			if (!Advapi32.INSTANCE.LookupPrivilegeValue(null, WinNT.SE_DEBUG_NAME, luid)) {
 				throw new Win32Exception(Native.getLastError());
 			}
 
-			TOKEN_PRIVILEGES tkp = new TOKEN_PRIVILEGES(1);
+			final TOKEN_PRIVILEGES tkp = new TOKEN_PRIVILEGES(1);
 			tkp.Privileges[0] = new LUID_AND_ATTRIBUTES(luid, new DWORD(WinNT.SE_PRIVILEGE_ENABLED));
 			if (!Advapi32.INSTANCE.AdjustTokenPrivileges(hToken.getValue(), false, tkp, 0, null, null)) {
 				throw new Win32Exception(Native.getLastError());
 			}
-		} catch (Win32Exception e) {
+		} catch (final Win32Exception e) {
 			winException = e;
 		} finally {
 			if (!Kernel32.INSTANCE.CloseHandle(hToken.getValue())) {
-				Win32Exception e = new Win32Exception(Native.getLastError());
+				final Win32Exception e = new Win32Exception(Native.getLastError());
 				if (winException != null) {
 					e.addSuppressed(winException);
 				}

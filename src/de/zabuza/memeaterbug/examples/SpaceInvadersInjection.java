@@ -128,9 +128,9 @@ public final class SpaceInvadersInjection extends Thread {
 	@Override
 	public void run() {
 		// We start in a static context and need to access the game instances
-		Frame[] frames = Frame.getFrames();
+		final Frame[] frames = Frame.getFrames();
 		JFrame gameFrame = null;
-		for (Frame frame : frames) {
+		for (final Frame frame : frames) {
 			if (frame.getTitle().equalsIgnoreCase(WINDOW_TITLE) && frame instanceof JFrame) {
 				gameFrame = (JFrame) frame;
 				break;
@@ -142,12 +142,12 @@ public final class SpaceInvadersInjection extends Thread {
 
 		Class<?> gameClass = null;
 		try {
-			ClassLoader classLoader = SpaceInvadersInjection.class.getClassLoader();
+			final ClassLoader classLoader = SpaceInvadersInjection.class.getClassLoader();
 			if (classLoader == null) {
 				throw new IllegalStateException("Can not find ClassLoader.");
 			}
 			gameClass = classLoader.loadClass(GAME_CLASS_NAME);
-		} catch (ClassNotFoundException e1) {
+		} catch (final ClassNotFoundException e1) {
 			e1.printStackTrace();
 		}
 
@@ -155,22 +155,22 @@ public final class SpaceInvadersInjection extends Thread {
 
 		// Frame found, find the LayeredPane which holds the content
 		if (gameFrame != null) {
-			for (Component compOne : gameFrame.getComponents()) {
+			for (final Component compOne : gameFrame.getComponents()) {
 				if (compOne instanceof JRootPane) {
-					JRootPane rootPane = (JRootPane) compOne;
-					for (Component compTwo : rootPane.getComponents()) {
+					final JRootPane rootPane = (JRootPane) compOne;
+					for (final Component compTwo : rootPane.getComponents()) {
 						if (compTwo instanceof JLayeredPane) {
-							JLayeredPane rootLayeredPane = (JLayeredPane) compTwo;
-							for (Component compThree : rootLayeredPane.getComponents()) {
+							final JLayeredPane rootLayeredPane = (JLayeredPane) compTwo;
+							for (final Component compThree : rootLayeredPane.getComponents()) {
 								if (compThree instanceof JPanel) {
-									JPanel rootPanel = (JPanel) compThree;
-									for (Component compFour : rootPanel.getComponents()) {
+									final JPanel rootPanel = (JPanel) compThree;
+									for (final Component compFour : rootPanel.getComponents()) {
 										if (compFour instanceof JLayeredPane) {
 											// Here is the content of the frame
-											JLayeredPane layeredPane = (JLayeredPane) compFour;
+											final JLayeredPane layeredPane = (JLayeredPane) compFour;
 											// Search for the games content
 											// canvas
-											for (Component compFive : layeredPane.getComponents()) {
+											for (final Component compFive : layeredPane.getComponents()) {
 												if (gameClass != null && gameClass.isInstance(compFive)) {
 													gameComponent = compFive;
 
@@ -215,9 +215,9 @@ public final class SpaceInvadersInjection extends Thread {
 			try {
 				// Access the private field of the game object
 				if (gameClass != null) {
-					Field field = gameClass.getDeclaredField(GAME_REMAINING_ALIEN_FIELD);
+					final Field field = gameClass.getDeclaredField(GAME_REMAINING_ALIEN_FIELD);
 					field.setAccessible(true);
-					int remainingAliens = field.getInt(gameComponent);
+					final int remainingAliens = field.getInt(gameComponent);
 					if (overlay != null) {
 						overlay.updateRemainingAliens(remainingAliens);
 					}

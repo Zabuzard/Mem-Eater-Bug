@@ -80,11 +80,11 @@ public final class PsapiUtil {
 	 */
 	public static List<HMODULE> enumProcessModulesEx(final HANDLE hProcess, final Integer listFlag)
 			throws Win32Exception {
-		int moduleSize = MemSize.getSizeOfModule(hProcess);
-		List<HMODULE> list = new LinkedList<>();
+		final int moduleSize = MemSize.getSizeOfModule(hProcess);
+		final List<HMODULE> list = new LinkedList<>();
 
-		HMODULE[] lphModule = new HMODULE[MODULE_BUFFER_AMOUNT * moduleSize];
-		IntByReference lpcbNeededs = new IntByReference();
+		final HMODULE[] lphModule = new HMODULE[MODULE_BUFFER_AMOUNT * moduleSize];
+		final IntByReference lpcbNeededs = new IntByReference();
 
 		if (listFlag == null) {
 			if (!Psapi.INSTANCE.EnumProcessModules(hProcess, lphModule, lphModule.length, lpcbNeededs)) {
@@ -162,7 +162,7 @@ public final class PsapiUtil {
 	 *             If the operation was not successful
 	 */
 	public static String getModuleFileNameEx(final HANDLE hProcess, final HANDLE hModule) throws Win32Exception {
-		Memory lpImageFileName = new Memory(512);
+		final Memory lpImageFileName = new Memory(512);
 		if (Psapi.INSTANCE.GetModuleFileNameEx(hProcess, hModule, lpImageFileName, 256) == 0) {
 			throw new Win32Exception(Native.getLastError());
 		}
@@ -193,7 +193,7 @@ public final class PsapiUtil {
 	 */
 	public static LPMODULEINFO getModuleInformation(final HANDLE hProcess, final HMODULE hModule)
 			throws Win32Exception {
-		LPMODULEINFO lpmodinfo = new LPMODULEINFO();
+		final LPMODULEINFO lpmodinfo = new LPMODULEINFO();
 
 		if (!Psapi.INSTANCE.GetModuleInformation(hProcess, hModule, lpmodinfo, lpmodinfo.size())) {
 			throw new Win32Exception(Native.getLastError());
@@ -210,9 +210,9 @@ public final class PsapiUtil {
 	 *         if not found
 	 */
 	public static Process getProcessById(final int processId) {
-		Iterator<Process> processes = Kernel32Util.getProcessList().iterator();
+		final Iterator<Process> processes = Kernel32Util.getProcessList().iterator();
 		while (processes.hasNext()) {
-			Process process = processes.next();
+			final Process process = processes.next();
 			if (process.getPid() == processId) {
 				return process;
 			}
@@ -230,9 +230,9 @@ public final class PsapiUtil {
 	 */
 	public static int getProcessIdBySzExeFile(final String szExeFile) {
 		try {
-			Iterator<Process> processes = Kernel32Util.getProcessList().iterator();
+			final Iterator<Process> processes = Kernel32Util.getProcessList().iterator();
 			while (processes.hasNext()) {
-				Process process = processes.next();
+				final Process process = processes.next();
 				if (process.getSzExeFile().equalsIgnoreCase(szExeFile)) {
 					return process.getPid();
 				}
@@ -261,7 +261,7 @@ public final class PsapiUtil {
 	 *             If the operation was not successful
 	 */
 	public static String getProcessImageFileName(final HANDLE hProcess) throws Win32Exception {
-		byte[] lpImageFileName = new byte[256];
+		final byte[] lpImageFileName = new byte[256];
 		if (Psapi.INSTANCE.GetProcessImageFileName(hProcess, lpImageFileName, 256) == 0) {
 			throw new Win32Exception(Native.getLastError());
 		}

@@ -116,7 +116,7 @@ public final class Process {
 	 *      "https://msdn.microsoft.com/en-us/library/ms633515(v=vs.85).aspx">
 	 *      MSDN webpage#GetWindow function</a>
 	 */
-	private List<HWND> mHWindows;
+	private final List<HWND> mHWindows;
 	/**
 	 * A cached icon of this process. Updated by {@link #getIcon()}.
 	 * 
@@ -222,7 +222,7 @@ public final class Process {
 		if (!(obj instanceof Process)) {
 			return false;
 		}
-		Process other = (Process) obj;
+		final Process other = (Process) obj;
 		if (this.mPid != other.mPid) {
 			return false;
 		}
@@ -239,7 +239,7 @@ public final class Process {
 	 * @return Pointer to the load address of this process module
 	 */
 	public Pointer getBase() {
-		Module module = getModule();
+		final Module module = getModule();
 		if (module != null) {
 			return module.getLpBaseOfDll();
 		}
@@ -308,13 +308,13 @@ public final class Process {
 
 		HICON hIcon = null;
 
-		Pointer firstAttempt = Shell32Util.extractSmallIcon(getModuleFileNameExA(), 1);
+		final Pointer firstAttempt = Shell32Util.extractSmallIcon(getModuleFileNameExA(), 1);
 		if (firstAttempt != null) {
 			hIcon = new HICON(firstAttempt);
 		}
 
 		if (hIcon == null) {
-			Pointer secondAttempt = Shell32Util.extractSmallIcon(this.mSzExeFile, 1);
+			final Pointer secondAttempt = Shell32Util.extractSmallIcon(this.mSzExeFile, 1);
 			if (secondAttempt != null) {
 				hIcon = new HICON(secondAttempt);
 			}
@@ -349,7 +349,7 @@ public final class Process {
 		if (this.mModuleCache != null) {
 			return this.mModuleCache;
 		}
-		List<Module> modules = getModules();
+		final List<Module> modules = getModules();
 		if (modules != null && modules.size() > PROCESS_MODULE_INDEX) {
 			this.mModuleCache = modules.get(PROCESS_MODULE_INDEX);
 		}
@@ -370,7 +370,7 @@ public final class Process {
 	public String getModuleFileNameExA() {
 		try {
 			return PsapiUtil.getModuleFileNameEx(getHandle(), null);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return "";
 		}
 	}
@@ -386,13 +386,13 @@ public final class Process {
 	 */
 	public List<Module> getModules() {
 		try {
-			List<HMODULE> pointers = PsapiUtil.enumProcessModules(getHandle());
-			List<Module> modules = new LinkedList<>();
-			for (HMODULE hModule : pointers) {
+			final List<HMODULE> pointers = PsapiUtil.enumProcessModules(getHandle());
+			final List<Module> modules = new LinkedList<>();
+			for (final HMODULE hModule : pointers) {
 				modules.add(new Module(getHandle(), hModule));
 			}
 			return modules;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return null;
 		}
 	}
@@ -435,7 +435,7 @@ public final class Process {
 	public String getProcessImageFileName() {
 		try {
 			return PsapiUtil.getProcessImageFileName(getHandle());
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			return "";
 		}
 	}
@@ -450,7 +450,7 @@ public final class Process {
 	 * @return The size of the linear space that the process module occupies
 	 */
 	public int getSize() {
-		Module module = getModule();
+		final Module module = getModule();
 		if (module != null) {
 			return module.getSizeOfImage();
 		}
@@ -472,14 +472,14 @@ public final class Process {
 			return null;
 		}
 		final long adressAsValue = address.longValue();
-		List<Module> modules = getModules();
+		final List<Module> modules = getModules();
 		long begin;
 		long end;
-		for (Module module : modules) {
+		for (final Module module : modules) {
 			begin = Pointer.nativeValue(module.getLpBaseOfDll());
 			end = begin + module.getSizeOfImage();
 			if (begin <= adressAsValue && adressAsValue <= end) {
-				File f = new File(module.getFileName());
+				final File f = new File(module.getFileName());
 				return f.getName() + "+" + String.format(Formats.EIGHT_HEX_NUMBER, Long.valueOf(adressAsValue - begin));
 			}
 		}

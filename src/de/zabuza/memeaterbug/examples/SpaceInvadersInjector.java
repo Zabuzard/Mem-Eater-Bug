@@ -24,14 +24,14 @@ public final class SpaceInvadersInjector {
 	 */
 	public static void main(final String[] args) {
 		// Constants
-		String windowTitle = "Space Invaders 101";
-		String pathToInjectionAgent = "C:\\Users\\Zabuza\\Desktop\\SpaceInvadersInjection.jar";
-		String injectionClassName = "de.zabuza.memeaterbug.examples.SpaceInvadersInjection";
+		final String windowTitle = "Space Invaders 101";
+		final String pathToInjectionAgent = "C:\\Users\\Zabuza\\Desktop\\SpaceInvadersInjection.jar";
+		final String injectionClassName = "de.zabuza.memeaterbug.examples.SpaceInvadersInjection";
 
 		// Hook to the game
-		MemEaterBug memEaterBug = new MemEaterBug(null, windowTitle);
+		final MemEaterBug memEaterBug = new MemEaterBug(null, windowTitle);
 		memEaterBug.hookProcess();
-		Injector injector = memEaterBug.getInjector();
+		final Injector injector = memEaterBug.getInjector();
 
 		// Inject the agent jar into the target jar
 		injector.injectJarIntoJar(pathToInjectionAgent, injectionClassName);

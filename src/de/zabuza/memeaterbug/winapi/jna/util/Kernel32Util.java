@@ -106,7 +106,7 @@ public final class Kernel32Util {
 	 *             If the operation was not successful
 	 */
 	public static void closeHandle(final HANDLE processHandle) throws Win32Exception {
-		boolean success = Kernel32.INSTANCE.CloseHandle(processHandle);
+		final boolean success = Kernel32.INSTANCE.CloseHandle(processHandle);
 		if (!success) {
 			throw new Win32Exception(Native.getLastError());
 		}
@@ -120,11 +120,12 @@ public final class Kernel32Util {
 	 *             If the operation was not successful
 	 */
 	public static ProcessList getProcessList() throws Win32Exception {
-		ProcessList plist = new ProcessList();
+		final ProcessList plist = new ProcessList();
 
-		List<PROCESSENTRY32> list = new LinkedList<>();
+		final List<PROCESSENTRY32> list = new LinkedList<>();
 
-		HANDLE hProcessSnap = Kernel32.INSTANCE.CreateToolhelp32Snapshot(Tlhelp32.TH32CS_SNAPPROCESS, new DWORD(0));
+		final HANDLE hProcessSnap = Kernel32.INSTANCE.CreateToolhelp32Snapshot(Tlhelp32.TH32CS_SNAPPROCESS,
+				new DWORD(0));
 
 		PROCESSENTRY32 pe32 = new PROCESSENTRY32();
 		if (!Kernel32.INSTANCE.Process32First(hProcessSnap, pe32)) {
@@ -138,16 +139,16 @@ public final class Kernel32Util {
 			pe32 = new PROCESSENTRY32();
 		} while (Kernel32.INSTANCE.Process32Next(hProcessSnap, pe32));
 
-		for (PROCESSENTRY32 pe : list) {
+		for (final PROCESSENTRY32 pe : list) {
 			plist.add(new Process(pe));
 		}
 
 		Kernel32.INSTANCE.CloseHandle(hProcessSnap);
 
-		List<DesktopWindow> windows = WindowUtils.getAllWindows(false);
-		IntByReference lpdwProcessId = new IntByReference();
+		final List<DesktopWindow> windows = WindowUtils.getAllWindows(false);
+		final IntByReference lpdwProcessId = new IntByReference();
 		int pid = 0;
-		for (DesktopWindow window : windows) {
+		for (final DesktopWindow window : windows) {
 			User32.INSTANCE.GetWindowThreadProcessId(window.getHWND(), lpdwProcessId);
 			pid = lpdwProcessId.getValue();
 			plist.add(pid, window.getHWND());
@@ -172,8 +173,8 @@ public final class Kernel32Util {
 			return false;
 		}
 
-		IntByReference isWow64 = new IntByReference();
-		boolean success = Kernel32.INSTANCE.IsWow64Process(hProcess, isWow64);
+		final IntByReference isWow64 = new IntByReference();
+		final boolean success = Kernel32.INSTANCE.IsWow64Process(hProcess, isWow64);
 		if (!success) {
 			throw new Win32Exception(Native.getLastError());
 		}
@@ -211,7 +212,7 @@ public final class Kernel32Util {
 	 */
 	public static HANDLE openProcess(final int dwDesiredAccess,
 			@SuppressWarnings("unused") final boolean bInheritHandle, final int dwProcessId) throws Win32Exception {
-		HANDLE process = Kernel32.INSTANCE.OpenProcess(dwDesiredAccess, false, dwProcessId);
+		final HANDLE process = Kernel32.INSTANCE.OpenProcess(dwDesiredAccess, false, dwProcessId);
 		if (process == null) {
 			throw new Win32Exception(Native.getLastError());
 		}
@@ -238,8 +239,8 @@ public final class Kernel32Util {
 	 */
 	public static Memory readMemory(final HANDLE process, final long address, final int bytesToRead)
 			throws Win32Exception {
-		IntByReference read = new IntByReference(0);
-		Memory output = new Memory(bytesToRead);
+		final IntByReference read = new IntByReference(0);
+		final Memory output = new Memory(bytesToRead);
 
 		Kernel32Util.readProcessMemory(process, address, output, bytesToRead, read);
 		return output;
@@ -277,7 +278,7 @@ public final class Kernel32Util {
 	 */
 	public static void readProcessMemory(final HANDLE hProcess, final long pAddress, final Pointer outputBuffer,
 			final int nSize, final IntByReference outNumberOfBytesRead) throws Win32Exception {
-		boolean success = Kernel32.INSTANCE.ReadProcessMemory(hProcess, pAddress, outputBuffer, nSize,
+		final boolean success = Kernel32.INSTANCE.ReadProcessMemory(hProcess, pAddress, outputBuffer, nSize,
 				outNumberOfBytesRead);
 		if (!success) {
 			throw new Win32Exception(Native.getLastError());
@@ -309,8 +310,8 @@ public final class Kernel32Util {
 	 */
 	public static MEMORY_BASIC_INFORMATION virtualQueryEx(final HANDLE hProcess, final Pointer lpAddress)
 			throws Win32Exception {
-		MEMORY_BASIC_INFORMATION lpBuffer = new MEMORY_BASIC_INFORMATION();
-		SIZE_T ret = Kernel32.INSTANCE.VirtualQueryEx(hProcess, lpAddress, lpBuffer, new SIZE_T(lpBuffer.size()));
+		final MEMORY_BASIC_INFORMATION lpBuffer = new MEMORY_BASIC_INFORMATION();
+		final SIZE_T ret = Kernel32.INSTANCE.VirtualQueryEx(hProcess, lpAddress, lpBuffer, new SIZE_T(lpBuffer.size()));
 		if (ret.intValue() == 0) {
 			throw new Win32Exception(Native.getLastError());
 		}
@@ -345,8 +346,8 @@ public final class Kernel32Util {
 	 *             If the operation was not successful
 	 */
 	public static void writeMemory(final HANDLE process, final long address, final byte[] data) throws Win32Exception {
-		int size = data.length;
-		Memory toWrite = new Memory(size);
+		final int size = data.length;
+		final Memory toWrite = new Memory(size);
 
 		for (int i = 0; i < size; i++) {
 			toWrite.setByte(i, data[i]);
@@ -384,10 +385,10 @@ public final class Kernel32Util {
 	 */
 	public static void writeMemoryReversely(final HANDLE process, final long address, final byte[] data)
 			throws Win32Exception {
-		int size = data.length;
-		Memory toWrite = new Memory(size);
+		final int size = data.length;
+		final Memory toWrite = new Memory(size);
 
-		int lastIndex = size - 1;
+		final int lastIndex = size - 1;
 		for (int i = 0; i < size; i++) {
 			toWrite.setByte(i, data[lastIndex - i]);
 		}
@@ -431,7 +432,7 @@ public final class Kernel32Util {
 	 */
 	public static void writeProcessMemory(final HANDLE hProcess, final long lpBaseAddress, final Pointer lpBuffer,
 			final int nSize, final IntByReference lpNumberOfBytesWritten) throws Win32Exception {
-		boolean success = Kernel32.INSTANCE.WriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize,
+		final boolean success = Kernel32.INSTANCE.WriteProcessMemory(hProcess, lpBaseAddress, lpBuffer, nSize,
 				lpNumberOfBytesWritten);
 		if (!success) {
 			throw new Win32Exception(Native.getLastError());

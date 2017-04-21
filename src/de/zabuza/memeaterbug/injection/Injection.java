@@ -52,13 +52,13 @@ public final class Injection {
 			if (args == null || args.length() <= 0) {
 				throw new IllegalArgumentException(ERROR_ARG_LENGTH);
 			}
-			String[] argsArray = args.split(ARG_SEPARATOR);
+			final String[] argsArray = args.split(ARG_SEPARATOR);
 			if (argsArray.length < 2) {
 				throw new IllegalArgumentException(ERROR_ARG_LENGTH);
 			}
 
-			String threadClassName = argsArray[0];
-			Class<?> threadClass = Class.forName(threadClassName);
+			final String threadClassName = argsArray[0];
+			final Class<?> threadClass = Class.forName(threadClassName);
 			if (threadClass.isAssignableFrom(Thread.class)) {
 				throw new IllegalArgumentException(ERROR_NO_THREAD);
 			}
@@ -67,7 +67,7 @@ public final class Injection {
 			Constructor<?> threadConstructor = null;
 			try {
 				threadConstructor = threadClass.getConstructor(String[].class);
-			} catch (NoSuchMethodException e) {
+			} catch (final NoSuchMethodException e) {
 				threadConstructor = threadClass.getConstructor();
 				useDefaultConstructor = true;
 			}
@@ -79,9 +79,9 @@ public final class Injection {
 				threadObject = threadConstructor.newInstance(new Object[] { argsArray });
 			}
 
-			Thread thread = (Thread) threadObject;
+			final Thread thread = (Thread) threadObject;
 			thread.start();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			// Catch and print every exception as they would otherwise be
 			// ignored in an agentmain method
 			e.printStackTrace();

@@ -23,28 +23,28 @@ public final class SoliScorer {
 	 */
 	public static void main(final String[] args) {
 		// Constants
-		String exeFileName = "Solitaire.exe";
-		int nextScore = 1500;
+		final String exeFileName = "Solitaire.exe";
+		final int nextScore = 1500;
 		// Offsets are found with a MemReader like CheatEngine
-		int scoreBaseAddressOffset = 0xBAFA8;
-		int[] scoreOffsets = new int[] { 0x50, 0x14 };
+		final int scoreBaseAddressOffset = 0xBAFA8;
+		final int[] scoreOffsets = new int[] { 0x50, 0x14 };
 
 		// Hook to the game
-		MemEaterBug memEaterBug = new MemEaterBug(exeFileName);
+		final MemEaterBug memEaterBug = new MemEaterBug(exeFileName);
 		memEaterBug.hookProcess();
-		MemManipulator memManipulator = memEaterBug.getMemManipulator();
+		final MemManipulator memManipulator = memEaterBug.getMemManipulator();
 
 		// Find the dynamic address of the score
-		long scoreBaseAddress = memManipulator.getBaseAddress() + scoreBaseAddressOffset;
-		long scoreDynAddress = memManipulator.findDynAddress(scoreOffsets, scoreBaseAddress);
+		final long scoreBaseAddress = memManipulator.getBaseAddress() + scoreBaseAddressOffset;
+		final long scoreDynAddress = memManipulator.findDynAddress(scoreOffsets, scoreBaseAddress);
 
 		// Read the current score
-		int score = memManipulator.readInt(scoreDynAddress);
+		final int score = memManipulator.readInt(scoreDynAddress);
 		System.out.println("The current score is: " + score);
 
 		// Write to the current score
 		memManipulator.writeInt(scoreDynAddress, nextScore);
-		int readScore = memManipulator.readInt(scoreDynAddress);
+		final int readScore = memManipulator.readInt(scoreDynAddress);
 		System.out.println("Now the score is: " + readScore);
 
 		// Unhook from the game

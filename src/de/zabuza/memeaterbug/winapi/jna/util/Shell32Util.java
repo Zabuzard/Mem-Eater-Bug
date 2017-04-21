@@ -33,7 +33,7 @@ public final class Shell32Util {
 	 *             If the operation was not successful
 	 */
 	public static Pointer extractSmallIcon(final String lpszFile, final int nIcons) throws Win32Exception {
-		Pointer[] hIcons = new Pointer[1];
+		final Pointer[] hIcons = new Pointer[1];
 		Shell32.INSTANCE.ExtractIconEx(lpszFile, 0, null, hIcons, nIcons);
 		return hIcons[0];
 	}

@@ -132,19 +132,19 @@ public final class Injector {
 	public void injectJarIntoJar(final String pathToAgentJar, final String threadClassName,
 			final String[] additionalArgs) throws UnableToInjectException {
 		try {
-			StringBuilder argsToPass = new StringBuilder();
+			final StringBuilder argsToPass = new StringBuilder();
 			if (threadClassName != null && threadClassName.length() > 0) {
 				argsToPass.append(threadClassName).append(ARG_SEPARATOR);
 			}
-			String processIdAsString = String.valueOf(this.mProcess.getPid());
+			final String processIdAsString = String.valueOf(this.mProcess.getPid());
 			argsToPass.append(processIdAsString);
 			if (additionalArgs != null && additionalArgs.length > 0) {
-				for (String addtionalArg : additionalArgs) {
+				for (final String addtionalArg : additionalArgs) {
 					argsToPass.append(ARG_SEPARATOR).append(addtionalArg);
 				}
 			}
 
-			VirtualMachine vm = VirtualMachine.attach(processIdAsString);
+			final VirtualMachine vm = VirtualMachine.attach(processIdAsString);
 			vm.loadAgent(pathToAgentJar, argsToPass.toString());
 			vm.detach();
 		} catch (AttachNotSupportedException | AgentLoadException | AgentInitializationException | IOException e) {
@@ -187,8 +187,8 @@ public final class Injector {
 	 */
 	public void injectLibraryIntoJar(final String pathToAgentLibrary) throws UnableToInjectException {
 		try {
-			String processIdAsString = String.valueOf(this.mProcess.getPid());
-			VirtualMachine vm = VirtualMachine.attach(processIdAsString);
+			final String processIdAsString = String.valueOf(this.mProcess.getPid());
+			final VirtualMachine vm = VirtualMachine.attach(processIdAsString);
 			vm.loadAgentLibrary(pathToAgentLibrary);
 			vm.detach();
 		} catch (AttachNotSupportedException | AgentLoadException | AgentInitializationException | IOException e) {

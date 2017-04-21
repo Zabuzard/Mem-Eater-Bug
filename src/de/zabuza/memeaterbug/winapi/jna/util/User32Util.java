@@ -79,7 +79,7 @@ public final class User32Util {
 	 *         extended error information, call {@link Native#getLastError()}.
 	 */
 	public static Pointer findWindowA(final String windowClass, final String windowTitle) {
-		Pointer hWnd = User32.INSTANCE.FindWindowA(windowClass, windowTitle);
+		final Pointer hWnd = User32.INSTANCE.FindWindowA(windowClass, windowTitle);
 		return hWnd;
 	}
 
@@ -93,7 +93,17 @@ public final class User32Util {
 	 */
 	public static HICON getHIcon(final HWND hWnd) {
 		try {
-			Pointer icon = sendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL, 0, WinUser.SMTO_NORMAL,
+			final Pointer icon = sendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL, 0,
+					WinUser.SMTO_NORMAL, STD_MESSAGE_TIMEOUT);
+			if (Pointer.nativeValue(icon) != 0) {
+				return User32.INSTANCE.CopyIcon(new HICON(icon));
+			}
+		} catch (final Win32Exception e) {
+			// Just catch the exception and return an error code
+		}
+
+		try {
+			final Pointer icon = sendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_BIG, 0, WinUser.SMTO_NORMAL,
 					STD_MESSAGE_TIMEOUT);
 			if (Pointer.nativeValue(icon) != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(icon));
@@ -103,8 +113,8 @@ public final class User32Util {
 		}
 
 		try {
-			Pointer icon = sendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_BIG, 0, WinUser.SMTO_NORMAL,
-					STD_MESSAGE_TIMEOUT);
+			final Pointer icon = sendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL2, 0,
+					WinUser.SMTO_NORMAL, STD_MESSAGE_TIMEOUT);
 			if (Pointer.nativeValue(icon) != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(icon));
 			}
@@ -113,17 +123,7 @@ public final class User32Util {
 		}
 
 		try {
-			Pointer icon = sendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL2, 0, WinUser.SMTO_NORMAL,
-					STD_MESSAGE_TIMEOUT);
-			if (Pointer.nativeValue(icon) != 0) {
-				return User32.INSTANCE.CopyIcon(new HICON(icon));
-			}
-		} catch (final Win32Exception e) {
-			// Just catch the exception and return an error code
-		}
-
-		try {
-			long hiconSM = getClassLong(hWnd, User32.GCL_HICONSM);
+			final long hiconSM = getClassLong(hWnd, User32.GCL_HICONSM);
 			if (hiconSM != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(Pointer.createConstant(hiconSM)));
 			}
@@ -132,7 +132,7 @@ public final class User32Util {
 		}
 
 		try {
-			long hicon = getClassLong(hWnd, User32.GCL_HICON);
+			final long hicon = getClassLong(hWnd, User32.GCL_HICON);
 			if (hicon != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(Pointer.createConstant(hicon)));
 			}
@@ -151,15 +151,15 @@ public final class User32Util {
 	 * @return The icon that corresponds to a given icon handler
 	 */
 	public static BufferedImage getIcon(final HICON hIcon) {
-		int width = ICON_SIZE;
-		int height = ICON_SIZE;
-		short depth = ICON_DEPTH;
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		final int width = ICON_SIZE;
+		final int height = ICON_SIZE;
+		final short depth = ICON_DEPTH;
+		final BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-		Memory lpBitsColor = new Memory(width * height * depth / ICON_BYTE_SIZE);
-		Memory lpBitsMask = new Memory(width * height * depth / ICON_BYTE_SIZE);
-		BITMAPINFO info = new BITMAPINFO();
-		BITMAPINFOHEADER hdr = new BITMAPINFOHEADER();
+		final Memory lpBitsColor = new Memory(width * height * depth / ICON_BYTE_SIZE);
+		final Memory lpBitsMask = new Memory(width * height * depth / ICON_BYTE_SIZE);
+		final BITMAPINFO info = new BITMAPINFO();
+		final BITMAPINFOHEADER hdr = new BITMAPINFOHEADER();
 		info.bmiHeader = hdr;
 		hdr.biWidth = width;
 		hdr.biHeight = height;
@@ -167,8 +167,8 @@ public final class User32Util {
 		hdr.biBitCount = depth;
 		hdr.biCompression = WinGDI.BI_RGB;
 
-		HDC hDC = User32.INSTANCE.GetDC(null);
-		ICONINFO piconinfo = new ICONINFO();
+		final HDC hDC = User32.INSTANCE.GetDC(null);
+		final ICONINFO piconinfo = new ICONINFO();
 		User32.INSTANCE.GetIconInfo(hIcon, piconinfo);
 
 		GDI32.INSTANCE.GetDIBits(hDC, piconinfo.hbmColor, 0, height, lpBitsColor, info, WinGDI.DIB_RGB_COLORS);
@@ -213,7 +213,7 @@ public final class User32Util {
 	 *             If the operation was not successful
 	 */
 	public static IntByReference getWindowThreadProcessId(final Pointer hWnd) throws Win32Exception {
-		IntByReference pid = new IntByReference(0);
+		final IntByReference pid = new IntByReference(0);
 		User32.INSTANCE.GetWindowThreadProcessId(hWnd, pid);
 		if (pid.getValue() <= 0) {
 			throw new Win32Exception(Native.getLastError());
@@ -328,7 +328,7 @@ public final class User32Util {
 	 *             If the operation was not successful
 	 */
 	private static long getClassLong(final HWND hWnd, final int nIndex) throws Win32Exception {
-		long ret = User32.INSTANCE.GetClassLong(hWnd, nIndex);
+		final long ret = User32.INSTANCE.GetClassLong(hWnd, nIndex);
 		if (ret == 0) {
 			throw new Win32Exception(Native.getLastError());
 		}
@@ -366,8 +366,8 @@ public final class User32Util {
 	 */
 	private static Pointer sendMessageTimeoutA(final HWND hWnd, final int msg, final int wParam, final int lParam,
 			final int fuFlags, final int uTimeout) throws Win32Exception {
-		DWORDByReference lpdwResult = new DWORDByReference();
-		long ret = User32.INSTANCE.SendMessageTimeout(hWnd, msg, wParam, lParam, fuFlags, uTimeout, lpdwResult);
+		final DWORDByReference lpdwResult = new DWORDByReference();
+		final long ret = User32.INSTANCE.SendMessageTimeout(hWnd, msg, wParam, lParam, fuFlags, uTimeout, lpdwResult);
 		if (ret == 0) {
 			throw new Win32Exception(Native.getLastError());
 		}
