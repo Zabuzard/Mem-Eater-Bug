@@ -50,7 +50,7 @@ public final class SoliScorer {
 		// Unhook from the game
 		memEaterBug.unhookProcess();
 	}
-	
+
 	/**
 	 * Utility class. No implementation.
 	 */

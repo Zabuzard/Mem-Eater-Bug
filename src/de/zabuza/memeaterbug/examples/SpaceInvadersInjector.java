@@ -39,7 +39,7 @@ public final class SpaceInvadersInjector {
 		// Unhook from the game
 		memEaterBug.unhookProcess();
 	}
-	
+
 	/**
 	 * Utility class. No implementation.
 	 */

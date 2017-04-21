@@ -29,6 +29,19 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 public final class MemEaterBug {
 
 	/**
+	 * Ensures that the operating system is a Windows system.
+	 * 
+	 * @throws IllegalStateException
+	 *             If the operating system is not a Windows system
+	 */
+	private static void ensureOsIsWindows() throws IllegalStateException {
+		final String osName = System.getProperty(SystemProperties.OS_NAME);
+		if (!osName.toLowerCase().contains(Masks.OS_NAME_WINDOWS)) {
+			throw new IllegalStateException(ErrorMessages.OS_IS_NOT_WINDOWS + osName);
+		}
+	}
+
+	/**
 	 * Injector for the current process handle, if hooked, <tt>null</tt> else.
 	 */
 	private Injector mInjector;
@@ -51,6 +64,7 @@ public final class MemEaterBug {
 	 * Handle to the current process, if hooked, <tt>null</tt> else.
 	 */
 	private HANDLE mProcessHandle;
+
 	/**
 	 * Id of the process this Mem-Eater-Bug belongs to.
 	 */
@@ -76,17 +90,17 @@ public final class MemEaterBug {
 	public MemEaterBug(final int processId) {
 		ensureOsIsWindows();
 
-		mIsHooked = false;
-		mProcessHandle = null;
-		mMemManipulator = null;
-		mInjector = null;
+		this.mIsHooked = false;
+		this.mProcessHandle = null;
+		this.mMemManipulator = null;
+		this.mInjector = null;
 
 		if (processId == 0) {
 			throw new IllegalArgumentException(ErrorMessages.PROCESS_NOT_FOUND);
 		} else if (processId < 0) {
 			throw new IllegalArgumentException(ErrorMessages.PROCESS_ID_INVALID + processId);
 		}
-		mProcessId = processId;
+		this.mProcessId = processId;
 	}
 
 	/**
@@ -131,10 +145,10 @@ public final class MemEaterBug {
 	 */
 	public Injector getInjector() throws IllegalStateException {
 		ensureIsHooked();
-		if (mInjector == null) {
-			mInjector = new Injector(mProcessId, mProcessHandle);
+		if (this.mInjector == null) {
+			this.mInjector = new Injector(this.mProcessId, this.mProcessHandle);
 		}
-		return mInjector;
+		return this.mInjector;
 	}
 
 	/**
@@ -146,10 +160,10 @@ public final class MemEaterBug {
 	 */
 	public MemManipulator getMemManipulator() throws IllegalStateException {
 		ensureIsHooked();
-		if (mMemManipulator == null) {
-			mMemManipulator = new MemManipulator(mProcessId, mProcessHandle);
+		if (this.mMemManipulator == null) {
+			this.mMemManipulator = new MemManipulator(this.mProcessId, this.mProcessHandle);
 		}
-		return mMemManipulator;
+		return this.mMemManipulator;
 	}
 
 	/**
@@ -195,13 +209,13 @@ public final class MemEaterBug {
 	 *             If the Mem-Eater-Bug is already hooked to a process
 	 */
 	public void hookProcess(final int permissions) {
-		if (!mIsHooked) {
-			mProcessHandle = Kernel32Util.openProcess(permissions, true, mProcessId);
+		if (!this.mIsHooked) {
+			this.mProcessHandle = Kernel32Util.openProcess(permissions, true, this.mProcessId);
 		} else {
 			throw new IllegalStateException(ErrorMessages.PROCESS_UNABLE_TO_HOOK_SINCE_ALREADY_HOOKED);
 		}
-		mIsHooked = true;
-		mIs64BitProcess = Kernel32Util.is64Bit(mProcessHandle);
+		this.mIsHooked = true;
+		this.mIs64BitProcess = Kernel32Util.is64Bit(this.mProcessHandle);
 	}
 
 	/**
@@ -217,7 +231,7 @@ public final class MemEaterBug {
 	 */
 	public boolean is64BitProcess() {
 		ensureIsHooked();
-		return mIs64BitProcess;
+		return this.mIs64BitProcess;
 	}
 
 	/**
@@ -227,7 +241,7 @@ public final class MemEaterBug {
 	 *         <tt>false</tt> otherwise.
 	 */
 	public boolean isHooked() {
-		return mIsHooked;
+		return this.mIsHooked;
 	}
 
 	/**
@@ -239,15 +253,15 @@ public final class MemEaterBug {
 	 *             If the Mem-Eater-Bug is not hooked to a process
 	 */
 	public void unhookProcess() {
-		if (mIsHooked) {
-			Kernel32Util.closeHandle(mProcessHandle);
+		if (this.mIsHooked) {
+			Kernel32Util.closeHandle(this.mProcessHandle);
 		} else {
 			throw new IllegalStateException(ErrorMessages.PROCESS_UNABLE_TO_UNHOOK_SINCE_NOT_HOOKED);
 		}
-		mProcessHandle = null;
-		mMemManipulator = null;
-		mInjector = null;
-		mIsHooked = false;
+		this.mProcessHandle = null;
+		this.mMemManipulator = null;
+		this.mInjector = null;
+		this.mIsHooked = false;
 	}
 
 	/**
@@ -258,21 +272,8 @@ public final class MemEaterBug {
 	 *             If the Mem-Eater-Bug is not hooked to a process
 	 */
 	private void ensureIsHooked() throws IllegalStateException {
-		if (!mIsHooked) {
+		if (!this.mIsHooked) {
 			throw new NotHookedException(ErrorMessages.UNABLE_SINCE_NOT_HOOKED);
-		}
-	}
-
-	/**
-	 * Ensures that the operating system is a Windows system.
-	 * 
-	 * @throws IllegalStateException
-	 *             If the operating system is not a Windows system
-	 */
-	private void ensureOsIsWindows() throws IllegalStateException {
-		String osName = System.getProperty(SystemProperties.OS_NAME);
-		if (!osName.toLowerCase().contains(Masks.OS_NAME_WINDOWS)) {
-			throw new IllegalStateException(ErrorMessages.OS_IS_NOT_WINDOWS + osName);
 		}
 	}
 }

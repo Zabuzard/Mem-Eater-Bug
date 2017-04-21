@@ -47,7 +47,7 @@ public final class Injection {
 	 * @param inst
 	 *            Object used for ByteCode manipulation
 	 */
-	public static void agentmain(final String args, final Instrumentation inst) {
+	public static void agentmain(final String args, @SuppressWarnings("unused") final Instrumentation inst) {
 		try {
 			if (args == null || args.length() <= 0) {
 				throw new IllegalArgumentException(ERROR_ARG_LENGTH);

@@ -162,7 +162,7 @@ public interface User32 extends com.sun.jna.platform.win32.User32 {
 	 *         duplicate icon.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is <tt>null</tt>. To get
-	 *         extended error information, call {@link #Native.GetLastError()}.
+	 *         extended error information, call {@link Native#getLastError()}.
 	 */
 	public HICON CopyIcon(final HICON hIcon);
 
@@ -188,7 +188,7 @@ public interface User32 extends com.sun.jna.platform.win32.User32 {
 	 *         window that has the specified class name and window name.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is <tt>null</tt>. To get
-	 *         extended error information, call {@link #Native.GetLastError()}.
+	 *         extended error information, call {@link Native#getLastError()}.
 	 */
 	public Pointer FindWindowA(final String lpClassName, final String lpWindowName);
 
@@ -250,7 +250,7 @@ public interface User32 extends com.sun.jna.platform.win32.User32 {
 	 *         value.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is zero. To get extended
-	 *         error information, call {@link #Native.GetLastError()}.
+	 *         error information, call {@link Native#getLastError()}.
 	 */
 	public int GetClassLong(final HWND hWnd, final int nIndex);
 

@@ -10,7 +10,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.PsapiUtil;
 /**
  * Represents Windows MODULEINFO structure.
  * 
- * @see <a href= <a href=
+ * @see <a href=
  *      "https://msdn.microsoft.com/en-us/library/ms684229(v=vs.85).aspx"> MSDN
  *      webpage#MODULEINFO structure</a>
  * 
@@ -82,9 +82,9 @@ public final class Module {
 		this.mHProcess = hProcess;
 		this.mHModule = hModule;
 
-		mLpBaseOfDll = null;
-		mEntryPoint = null;
-		mSizeOfImage = 0;
+		this.mLpBaseOfDll = null;
+		this.mEntryPoint = null;
+		this.mSizeOfImage = 0;
 	}
 
 	/**
@@ -98,7 +98,7 @@ public final class Module {
 	 */
 	public Pointer getEntryPoint() {
 		extractModuleInformation();
-		return mEntryPoint;
+		return this.mEntryPoint;
 	}
 
 	/**
@@ -112,7 +112,7 @@ public final class Module {
 	 *         module
 	 */
 	public String getFileName() {
-		return PsapiUtil.getModuleFileNameEx(mHProcess, mHModule);
+		return PsapiUtil.getModuleFileNameEx(this.mHProcess, this.mHModule);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public final class Module {
 	 * @return A handle to this module
 	 */
 	public HMODULE getHModule() {
-		return mHModule;
+		return this.mHModule;
 	}
 
 	/**
@@ -139,7 +139,7 @@ public final class Module {
 	 */
 	public Pointer getLpBaseOfDll() {
 		extractModuleInformation();
-		return mLpBaseOfDll;
+		return this.mLpBaseOfDll;
 	}
 
 	/**
@@ -153,7 +153,7 @@ public final class Module {
 	 */
 	public int getSizeOfImage() {
 		extractModuleInformation();
-		return mSizeOfImage;
+		return this.mSizeOfImage;
 	}
 
 	/**
@@ -164,12 +164,12 @@ public final class Module {
 	 *      MSDN webpage#GetModuleInformation function</a>
 	 */
 	private void extractModuleInformation() {
-		if (mEntryPoint == null) {
+		if (this.mEntryPoint == null) {
 			try {
-				LPMODULEINFO x = PsapiUtil.getModuleInformation(mHProcess, mHModule);
-				mLpBaseOfDll = x.lpBaseOfDll;
-				mSizeOfImage = x.SizeOfImage;
-				mEntryPoint = x.EntryPoint;
+				LPMODULEINFO x = PsapiUtil.getModuleInformation(this.mHProcess, this.mHModule);
+				this.mLpBaseOfDll = x.lpBaseOfDll;
+				this.mSizeOfImage = x.SizeOfImage;
+				this.mEntryPoint = x.EntryPoint;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

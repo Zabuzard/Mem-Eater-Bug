@@ -54,9 +54,8 @@ public final class MemSize {
 	public static int getSizeOfModule(final HANDLE hProcess) {
 		if (Kernel32Util.is64Bit(hProcess)) {
 			return MODULE_SIZE_64;
-		} else {
-			return MODULE_SIZE_32;
 		}
+		return MODULE_SIZE_32;
 	}
 
 	/**

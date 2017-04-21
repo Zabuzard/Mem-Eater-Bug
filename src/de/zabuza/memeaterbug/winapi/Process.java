@@ -26,7 +26,7 @@ import de.zabuza.memeaterbug.winapi.jna.util.User32Util;
  * Provides various process related methods for interaction with the Windows
  * API.
  * 
- * @see <a href= <a href=
+ * @see <a href=
  *      "https://msdn.microsoft.com/en-us/library/ms684839(v=vs.85).aspx"> MSDN
  *      webpage#PROCESSENTRY32 structure</a>
  * 
@@ -180,16 +180,16 @@ public final class Process {
 	 *            PROCESSENTRY32 structure of the process to wrap around
 	 */
 	public Process(final PROCESSENTRY32 pe32) {
-		mPid = pe32.th32ProcessID.intValue();
-		mSzExeFile = Native.toString(pe32.szExeFile);
-		mCntThreads = pe32.cntThreads.intValue();
-		mPcPriClassBase = pe32.pcPriClassBase.intValue();
-		mTh32ParentProcessID = pe32.th32ParentProcessID.intValue();
+		this.mPid = pe32.th32ProcessID.intValue();
+		this.mSzExeFile = Native.toString(pe32.szExeFile);
+		this.mCntThreads = pe32.cntThreads.intValue();
+		this.mPcPriClassBase = pe32.pcPriClassBase.intValue();
+		this.mTh32ParentProcessID = pe32.th32ParentProcessID.intValue();
 
-		mHandleCache = null;
-		mIconCache = null;
-		mModuleCache = null;
-		mHWindows = new LinkedList<HWND>();
+		this.mHandleCache = null;
+		this.mIconCache = null;
+		this.mModuleCache = null;
+		this.mHWindows = new LinkedList<>();
 	}
 
 	/**
@@ -203,7 +203,7 @@ public final class Process {
 	 *            Window handle to add
 	 */
 	public void addHwnd(final HWND hWnd) {
-		mHWindows.add(hWnd);
+		this.mHWindows.add(hWnd);
 	}
 
 	/*
@@ -223,7 +223,7 @@ public final class Process {
 			return false;
 		}
 		Process other = (Process) obj;
-		if (mPid != other.mPid) {
+		if (this.mPid != other.mPid) {
 			return false;
 		}
 		return true;
@@ -242,9 +242,8 @@ public final class Process {
 		Module module = getModule();
 		if (module != null) {
 			return module.getLpBaseOfDll();
-		} else {
-			return Pointer.NULL;
 		}
+		return Pointer.NULL;
 	}
 
 	/**
@@ -257,7 +256,7 @@ public final class Process {
 	 * @return The number of execution threads started by the process
 	 */
 	public int getCntThreads() {
-		return mCntThreads;
+		return this.mCntThreads;
 	}
 
 	/**
@@ -271,11 +270,11 @@ public final class Process {
 	 * @return A handle to this process that has all access rights
 	 */
 	public HANDLE getHandle() {
-		if (mHandleCache != null) {
-			return mHandleCache;
+		if (this.mHandleCache != null) {
+			return this.mHandleCache;
 		}
-		mHandleCache = Kernel32Util.openProcess(Kernel32Util.PROCESS_ALL_ACCESS, false, mPid);
-		return mHandleCache;
+		this.mHandleCache = Kernel32Util.openProcess(Kernel32Util.PROCESS_ALL_ACCESS, false, this.mPid);
+		return this.mHandleCache;
 	}
 
 	/**
@@ -289,7 +288,7 @@ public final class Process {
 	 * @return A list of windows the process has, as window handles
 	 */
 	public List<HWND> getHwnds() {
-		return mHWindows;
+		return this.mHWindows;
 	}
 
 	/**
@@ -303,8 +302,8 @@ public final class Process {
 	 * @return The icon of this process
 	 */
 	public ImageIcon getIcon() {
-		if (mIconCache != null) {
-			return mIconCache;
+		if (this.mIconCache != null) {
+			return this.mIconCache;
 		}
 
 		HICON hIcon = null;
@@ -315,24 +314,24 @@ public final class Process {
 		}
 
 		if (hIcon == null) {
-			Pointer secondAttempt = Shell32Util.extractSmallIcon(mSzExeFile, 1);
+			Pointer secondAttempt = Shell32Util.extractSmallIcon(this.mSzExeFile, 1);
 			if (secondAttempt != null) {
 				hIcon = new HICON(secondAttempt);
 			}
 		}
 
 		if (hIcon == null) {
-			if (mHWindows.size() > 0) {
-				hIcon = User32Util.getHIcon(User32.INSTANCE.GetAncestor(mHWindows.get(0), User32.GA_ROOTOWNER));
+			if (this.mHWindows.size() > 0) {
+				hIcon = User32Util.getHIcon(User32.INSTANCE.GetAncestor(this.mHWindows.get(0), User32.GA_ROOTOWNER));
 			}
 		}
 
 		if (hIcon != null) {
-			mIconCache = new ImageIcon(User32Util.getIcon(hIcon));
+			this.mIconCache = new ImageIcon(User32Util.getIcon(hIcon));
 		} else {
-			mIconCache = new ImageIcon();
+			this.mIconCache = new ImageIcon();
 		}
-		return mIconCache;
+		return this.mIconCache;
 	}
 
 	/**
@@ -347,14 +346,14 @@ public final class Process {
 	 *         for this process.
 	 */
 	public Module getModule() {
-		if (mModuleCache != null) {
-			return mModuleCache;
+		if (this.mModuleCache != null) {
+			return this.mModuleCache;
 		}
 		List<Module> modules = getModules();
 		if (modules != null && modules.size() > PROCESS_MODULE_INDEX) {
-			mModuleCache = modules.get(PROCESS_MODULE_INDEX);
+			this.mModuleCache = modules.get(PROCESS_MODULE_INDEX);
 		}
-		return mModuleCache;
+		return this.mModuleCache;
 	}
 
 	/**
@@ -388,7 +387,7 @@ public final class Process {
 	public List<Module> getModules() {
 		try {
 			List<HMODULE> pointers = PsapiUtil.enumProcessModules(getHandle());
-			List<Module> modules = new LinkedList<Module>();
+			List<Module> modules = new LinkedList<>();
 			for (HMODULE hModule : pointers) {
 				modules.add(new Module(getHandle(), hModule));
 			}
@@ -408,7 +407,7 @@ public final class Process {
 	 * @return The base priority of any threads created by this process
 	 */
 	public int getPcPriClassBase() {
-		return mPcPriClassBase;
+		return this.mPcPriClassBase;
 	}
 
 	/**
@@ -421,7 +420,7 @@ public final class Process {
 	 * @return The process identifier
 	 */
 	public int getPid() {
-		return mPid;
+		return this.mPid;
 	}
 
 	/**
@@ -454,9 +453,8 @@ public final class Process {
 		Module module = getModule();
 		if (module != null) {
 			return module.getSizeOfImage();
-		} else {
-			return 0;
 		}
+		return 0;
 	}
 
 	/**
@@ -473,15 +471,16 @@ public final class Process {
 		if (address == null) {
 			return null;
 		}
+		final long adressAsValue = address.longValue();
 		List<Module> modules = getModules();
 		long begin;
 		long end;
 		for (Module module : modules) {
 			begin = Pointer.nativeValue(module.getLpBaseOfDll());
 			end = begin + module.getSizeOfImage();
-			if (begin <= address && address <= end) {
+			if (begin <= adressAsValue && adressAsValue <= end) {
 				File f = new File(module.getFileName());
-				return f.getName() + "+" + String.format(Formats.EIGHT_HEX_NUMBER, address - begin);
+				return f.getName() + "+" + String.format(Formats.EIGHT_HEX_NUMBER, Long.valueOf(adressAsValue - begin));
 			}
 		}
 		return null;
@@ -497,7 +496,7 @@ public final class Process {
 	 * @return The name of the executable file for the process
 	 */
 	public String getSzExeFile() {
-		return mSzExeFile;
+		return this.mSzExeFile;
 	}
 
 	/**
@@ -512,7 +511,7 @@ public final class Process {
 	 *         parent process)
 	 */
 	public int getTh32ParentProcessID() {
-		return mTh32ParentProcessID;
+		return this.mTh32ParentProcessID;
 	}
 
 	/*
@@ -524,7 +523,7 @@ public final class Process {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + mPid;
+		result = prime * result + this.mPid;
 		return result;
 	}
 
@@ -569,9 +568,9 @@ public final class Process {
 	 *            Handle to this process
 	 */
 	public void setHandle(final HANDLE processHandle) {
-		if (mHandleCache != null) {
-			Kernel32Util.closeHandle(mHandleCache);
+		if (this.mHandleCache != null) {
+			Kernel32Util.closeHandle(this.mHandleCache);
 		}
-		mHandleCache = processHandle;
+		this.mHandleCache = processHandle;
 	}
 }

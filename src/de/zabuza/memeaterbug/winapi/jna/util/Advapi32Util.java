@@ -26,7 +26,7 @@ public final class Advapi32Util {
 	/**
 	 * Enables the SeDebugPrivilege privilege for the given process.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=vs.85).aspx">
 	 *      MSDN webpage#Process Security and Access Rights</a>
 	 * @param hProcess

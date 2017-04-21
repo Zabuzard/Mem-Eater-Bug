@@ -48,7 +48,7 @@ public final class SpaceInvadersInjection extends Thread {
 		 */
 		public GameOverlayPanel() {
 			setBackground(Color.BLACK);
-			mRemainingAliens = -1;
+			this.mRemainingAliens = -1;
 		}
 
 		/*
@@ -62,7 +62,7 @@ public final class SpaceInvadersInjection extends Thread {
 			g.fillRect(0, 0, getWidth(), getHeight());
 
 			g.setColor(Color.WHITE);
-			g.drawString("Remaining Aliens: " + mRemainingAliens, 5, getHeight() / 2);
+			g.drawString("Remaining Aliens: " + this.mRemainingAliens, 5, getHeight() / 2);
 		}
 
 		/**
@@ -70,10 +70,11 @@ public final class SpaceInvadersInjection extends Thread {
 		 * panel.
 		 * 
 		 * @param remainingAliens
+		 *            The amount of remaining aliens
 		 */
 		public void updateRemainingAliens(final int remainingAliens) {
-			if (mRemainingAliens != remainingAliens) {
-				mRemainingAliens = remainingAliens;
+			if (this.mRemainingAliens != remainingAliens) {
+				this.mRemainingAliens = remainingAliens;
 				repaint();
 			}
 		}
@@ -114,7 +115,7 @@ public final class SpaceInvadersInjection extends Thread {
 	 * @param args
 	 *            Additional arguments, not used
 	 */
-	public SpaceInvadersInjection(final String[] args) {
+	public SpaceInvadersInjection(@SuppressWarnings("unused") final String[] args) {
 		// Nothing to do here, we want to do our stuff in a new thread
 		// environment to not slow down the injector.
 	}
@@ -217,7 +218,9 @@ public final class SpaceInvadersInjection extends Thread {
 					Field field = gameClass.getDeclaredField(GAME_REMAINING_ALIEN_FIELD);
 					field.setAccessible(true);
 					int remainingAliens = field.getInt(gameComponent);
-					overlay.updateRemainingAliens(remainingAliens);
+					if (overlay != null) {
+						overlay.updateRemainingAliens(remainingAliens);
+					}
 				}
 
 				sleep(TIMEOUT);

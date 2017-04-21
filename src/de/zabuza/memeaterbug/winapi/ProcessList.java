@@ -15,17 +15,17 @@ import com.sun.jna.platform.win32.WinDef.HWND;
  * @author Zabuza {@literal <zabuza.dev@gmail.com>}
  *
  */
-public class ProcessList implements Iterable<Process> {
+public final class ProcessList implements Iterable<Process> {
 	/**
 	 * Data structure that provides a fast access to the stored objects by
 	 * iterating.
 	 */
-	private List<Process> list = new LinkedList<Process>();
+	private final List<Process> mList = new LinkedList<>();
 	/**
 	 * Data structure that provides a fast direct access to the stored objects
 	 * by their process ids.
 	 */
-	private Map<Integer, Process> map = new HashMap<Integer, Process>();
+	private final Map<Integer, Process> mMap = new HashMap<>();
 
 	/**
 	 * Adds a window handle to an already added process.
@@ -36,7 +36,7 @@ public class ProcessList implements Iterable<Process> {
 	 *            Handle of the window to add
 	 */
 	public void add(final int pid, final HWND hWnd) {
-		map.get(pid).addHwnd(hWnd);
+		this.mMap.get(Integer.valueOf(pid)).addHwnd(hWnd);
 	}
 
 	/**
@@ -46,8 +46,8 @@ public class ProcessList implements Iterable<Process> {
 	 *            Process to add
 	 */
 	public void add(final Process process) {
-		map.put(process.getPid(), process);
-		list.add(process);
+		this.mMap.put(Integer.valueOf(process.getPid()), process);
+		this.mList.add(process);
 	}
 
 	/*
@@ -57,7 +57,7 @@ public class ProcessList implements Iterable<Process> {
 	 */
 	@Override
 	public Iterator<Process> iterator() {
-		return list.iterator();
+		return this.mList.iterator();
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ProcessList implements Iterable<Process> {
 	 * @return The size of the list
 	 */
 	public int size() {
-		return list.size();
+		return this.mList.size();
 	}
 
 }

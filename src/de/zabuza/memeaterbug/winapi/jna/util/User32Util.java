@@ -76,7 +76,7 @@ public final class User32Util {
 	 *         window that has the specified class name and window name.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is <tt>null</tt>. To get
-	 *         extended error information, call {@link #Native.GetLastError()}.
+	 *         extended error information, call {@link Native#getLastError()}.
 	 */
 	public static Pointer findWindowA(final String windowClass, final String windowTitle) {
 		Pointer hWnd = User32.INSTANCE.FindWindowA(windowClass, windowTitle);
@@ -98,8 +98,8 @@ public final class User32Util {
 			if (Pointer.nativeValue(icon) != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(icon));
 			}
-		} catch (Win32Exception e) {
-
+		} catch (final Win32Exception e) {
+			// Just catch the exception and return an error code
 		}
 
 		try {
@@ -108,8 +108,8 @@ public final class User32Util {
 			if (Pointer.nativeValue(icon) != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(icon));
 			}
-		} catch (Win32Exception e) {
-
+		} catch (final Win32Exception e) {
+			// Just catch the exception and return an error code
 		}
 
 		try {
@@ -118,8 +118,8 @@ public final class User32Util {
 			if (Pointer.nativeValue(icon) != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(icon));
 			}
-		} catch (Win32Exception e) {
-
+		} catch (final Win32Exception e) {
+			// Just catch the exception and return an error code
 		}
 
 		try {
@@ -127,8 +127,8 @@ public final class User32Util {
 			if (hiconSM != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(Pointer.createConstant(hiconSM)));
 			}
-		} catch (Win32Exception e) {
-
+		} catch (final Win32Exception e) {
+			// Just catch the exception and return an error code
 		}
 
 		try {
@@ -136,8 +136,8 @@ public final class User32Util {
 			if (hicon != 0) {
 				return User32.INSTANCE.CopyIcon(new HICON(Pointer.createConstant(hicon)));
 			}
-		} catch (Win32Exception e) {
-
+		} catch (final Win32Exception e) {
+			// Just catch the exception and return an error code
 		}
 
 		return null;
@@ -215,7 +215,7 @@ public final class User32Util {
 	public static IntByReference getWindowThreadProcessId(final Pointer hWnd) throws Win32Exception {
 		IntByReference pid = new IntByReference(0);
 		User32.INSTANCE.GetWindowThreadProcessId(hWnd, pid);
-		if (pid == null || pid.getValue() <= 0) {
+		if (pid.getValue() <= 0) {
 			throw new Win32Exception(Native.getLastError());
 		}
 		return pid;
@@ -310,17 +310,17 @@ public final class User32Util {
 	 *            To retrieve any other value from the WNDCLASSEX structure,
 	 *            specify one of the following values.
 	 *            <ul>
-	 *            <li>{@link #GCW_ATOM}</li>
-	 *            <li>{@link #GCL_CBCLSEXTRA}</li>
-	 *            <li>{@link #GCL_CBWNDEXTRA}</li>
-	 *            <li>{@link #GCL_HBRBACKGROUND}</li>
-	 *            <li>{@link #GCL_HCURSOR}</li>
-	 *            <li>{@link #GCL_HICON}</li>
-	 *            <li>{@link #GCL_HICONSM}</li>
-	 *            <li>{@link #GCL_HMODULE}</li>
-	 *            <li>{@link #GCL_MENUNAME}</li>
-	 *            <li>{@link #GCL_STYLE}</li>
-	 *            <li>{@link #GCL_WNDPROC}</li>
+	 *            <li>{@link User32#GCW_ATOM}</li>
+	 *            <li>{@link User32#GCL_CBCLSEXTRA}</li>
+	 *            <li>{@link User32#GCL_CBWNDEXTRA}</li>
+	 *            <li>{@link User32#GCL_HBRBACKGROUND}</li>
+	 *            <li>{@link User32#GCL_HCURSOR}</li>
+	 *            <li>{@link User32#GCL_HICON}</li>
+	 *            <li>{@link User32#GCL_HICONSM}</li>
+	 *            <li>{@link User32#GCL_HMODULE}</li>
+	 *            <li>{@link User32#GCL_MENUNAME}</li>
+	 *            <li>{@link User32#GCL_STYLE}</li>
+	 *            <li>{@link User32#GCL_WNDPROC}</li>
 	 *            </ul>
 	 * @return The specified 32-bit (DWORD) value from the WNDCLASSEX structure
 	 *         associated with the specified window.

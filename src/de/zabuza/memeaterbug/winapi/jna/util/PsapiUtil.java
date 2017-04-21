@@ -34,7 +34,7 @@ public final class PsapiUtil {
 	/**
 	 * Retrieves a list of handles for each module in the specified process.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms682631(v=vs.85).aspx">
 	 *      MSDN webpage#EnumProcessModules function</a>
 	 * @param hProcess
@@ -51,7 +51,7 @@ public final class PsapiUtil {
 	 * Retrieves a list of handles for each module in the specified process,
 	 * that meets the filter criteria specified by the list flag.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms682631(v=vs.85).aspx">
 	 *      MSDN webpage#EnumProcessModules function</a>
 	 * @param hProcess
@@ -81,7 +81,7 @@ public final class PsapiUtil {
 	public static List<HMODULE> enumProcessModulesEx(final HANDLE hProcess, final Integer listFlag)
 			throws Win32Exception {
 		int moduleSize = MemSize.getSizeOfModule(hProcess);
-		List<HMODULE> list = new LinkedList<HMODULE>();
+		List<HMODULE> list = new LinkedList<>();
 
 		HMODULE[] lphModule = new HMODULE[MODULE_BUFFER_AMOUNT * moduleSize];
 		IntByReference lpcbNeededs = new IntByReference();
@@ -91,7 +91,8 @@ public final class PsapiUtil {
 				throw new Win32Exception(Native.getLastError());
 			}
 		} else {
-			if (!Psapi.INSTANCE.EnumProcessModulesEx(hProcess, lphModule, lphModule.length, lpcbNeededs, listFlag)) {
+			if (!Psapi.INSTANCE.EnumProcessModulesEx(hProcess, lphModule, lphModule.length, lpcbNeededs,
+					listFlag.intValue())) {
 				throw new Win32Exception(Native.getLastError());
 			}
 		}
@@ -107,7 +108,7 @@ public final class PsapiUtil {
 	 * Retrieves a list of handles for each 32-bit module in the specified
 	 * process.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms682633(v=vs.85).aspx">
 	 *      MSDN webpage#EnumProcessModulesEx function</a>
 	 * @param hProcess
@@ -117,14 +118,14 @@ public final class PsapiUtil {
 	 *             If the operation was not successful
 	 */
 	public static List<HMODULE> enumProcessModulesEx32(final HANDLE hProcess) throws Win32Exception {
-		return enumProcessModulesEx(hProcess, Psapi.LIST_MODULES_32BIT);
+		return enumProcessModulesEx(hProcess, Integer.valueOf(Psapi.LIST_MODULES_32BIT));
 	}
 
 	/**
 	 * Retrieves a list of handles for each 64-bit module in the specified
 	 * process.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms682633(v=vs.85).aspx">
 	 *      MSDN webpage#EnumProcessModulesEx function</a>
 	 * @param hProcess
@@ -134,14 +135,14 @@ public final class PsapiUtil {
 	 *             If the operation was not successful
 	 */
 	public static List<HMODULE> enumProcessModulesEx64(final HANDLE hProcess) throws Win32Exception {
-		return enumProcessModulesEx(hProcess, Psapi.LIST_MODULES_64BIT);
+		return enumProcessModulesEx(hProcess, Integer.valueOf(Psapi.LIST_MODULES_64BIT));
 	}
 
 	/**
 	 * Retrieves the fully qualified path for the file containing the specified
 	 * module.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms683198(v=vs.85).aspx">
 	 *      MSDN webpage#GetModuleFileNameEx function</a>
 	 * @param hProcess
@@ -236,8 +237,8 @@ public final class PsapiUtil {
 					return process.getPid();
 				}
 			}
-		} catch (Win32Exception e) {
-
+		} catch (final Win32Exception e) {
+			// Just catch the exception and return an error code
 		}
 
 		return 0;

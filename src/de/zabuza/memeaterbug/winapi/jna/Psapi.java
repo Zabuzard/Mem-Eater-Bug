@@ -128,7 +128,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 * @return If the function succeeds, the return value is nonzero.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is zero. To get extended
-	 *         error information, call {@link #Native.GetLastError()}.
+	 *         error information, call {@link Native#getLastError()}.
 	 */
 	public boolean EnumProcessModules(final HANDLE hProcess, final HMODULE[] lphModule, final int cb,
 			final IntByReference lpcbNeededs);
@@ -162,7 +162,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 * @return If the function succeeds, the return value is nonzero.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is zero. To get extended
-	 *         error information, call {@link #Native.GetLastError()}.
+	 *         error information, call {@link Native#getLastError()}.
 	 */
 	public boolean EnumProcessModulesEx(final HANDLE hProcess, final HMODULE[] lphModule, final int cb,
 			final IntByReference lpcbNeededs, final int dwFilterFlag);
@@ -193,7 +193,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 * @return If the function succeeds, the return value is nonzero.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is zero. To get extended
-	 *         error information, call {@link #Native.GetLastError()}.
+	 *         error information, call {@link Native#getLastError()}.
 	 */
 	public boolean GetModuleInformation(final HANDLE hProcess, final HMODULE hModule, final LPMODULEINFO lpmodinfo,
 			final int cb);
@@ -220,7 +220,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi {
 	 *         of the string copied to the buffer.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is zero. To get extended
-	 *         error information, call {@link #Native.GetLastError()}.
+	 *         error information, call {@link Native#getLastError()}.
 	 */
 	public int GetProcessImageFileName(final HANDLE hProcess, final byte[] lpImageFileName, final int nSize);
 

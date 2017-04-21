@@ -49,9 +49,9 @@ public final class MemManipulator {
 	 *            handle, that has all access rights.
 	 */
 	public MemManipulator(final int processId, final HANDLE processHandle) {
-		mProcess = PsapiUtil.getProcessById(processId);
+		this.mProcess = PsapiUtil.getProcessById(processId);
 		if (processHandle != null) {
-			mProcess.setHandle(processHandle);
+			this.mProcess.setHandle(processHandle);
 		}
 	}
 
@@ -94,13 +94,13 @@ public final class MemManipulator {
 
 		for (int i = 0; i < offsets.length; i++) {
 			if (i == 0) {
-				pTemp = Kernel32Util.readMemory(mProcess.getHandle(), startingAddress, size);
+				pTemp = Kernel32Util.readMemory(this.mProcess.getHandle(), startingAddress, size);
 			}
 
 			pointerAddress = pTemp.getInt(0) + offsets[i];
 
 			if (i != offsets.length - 1) {
-				pTemp = Kernel32Util.readMemory(mProcess.getHandle(), pointerAddress, size);
+				pTemp = Kernel32Util.readMemory(this.mProcess.getHandle(), pointerAddress, size);
 			}
 		}
 		return pointerAddress;
@@ -112,7 +112,7 @@ public final class MemManipulator {
 	 * @return The load address of this process module
 	 */
 	public long getBaseAddress() {
-		return Pointer.nativeValue(mProcess.getBase());
+		return Pointer.nativeValue(this.mProcess.getBase());
 	}
 
 	/**
@@ -137,7 +137,7 @@ public final class MemManipulator {
 	 * @return Object holding the read bytes
 	 */
 	public Memory readMemory(final long address, final int bytesToRead) {
-		return Kernel32Util.readMemory(mProcess.getHandle(), address, bytesToRead);
+		return Kernel32Util.readMemory(this.mProcess.getHandle(), address, bytesToRead);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public final class MemManipulator {
 	 * @return The string read from the given address
 	 */
 	public String readString(final long address, final int size) {
-		Memory output = Kernel32Util.readMemory(mProcess.getHandle(), address, size);
+		Memory output = Kernel32Util.readMemory(this.mProcess.getHandle(), address, size);
 		return output.getString(0);
 	}
 
@@ -175,7 +175,7 @@ public final class MemManipulator {
 		if (!Charset.availableCharsets().keySet().contains(encoding)) {
 			throw new UnsupportedEncodingException();
 		}
-		Memory output = Kernel32Util.readMemory(mProcess.getHandle(), address, sizeOfOneChar * length);
+		Memory output = Kernel32Util.readMemory(this.mProcess.getHandle(), address, sizeOfOneChar * length);
 		return output.getString(0, encoding);
 	}
 
@@ -202,7 +202,7 @@ public final class MemManipulator {
 	 *            lower to the higher indices.
 	 */
 	public void writeMemory(final long address, final byte[] bytesToWrite) {
-		Kernel32Util.writeMemory(mProcess.getHandle(), address, bytesToWrite);
+		Kernel32Util.writeMemory(this.mProcess.getHandle(), address, bytesToWrite);
 	}
 
 	/**
@@ -215,7 +215,7 @@ public final class MemManipulator {
 	 *            from the higher to the lower indices.
 	 */
 	public void writeMemoryReversely(final long address, final byte[] bytesToWrite) {
-		Kernel32Util.writeMemoryReversely(mProcess.getHandle(), address, bytesToWrite);
+		Kernel32Util.writeMemoryReversely(this.mProcess.getHandle(), address, bytesToWrite);
 	}
 
 	/**

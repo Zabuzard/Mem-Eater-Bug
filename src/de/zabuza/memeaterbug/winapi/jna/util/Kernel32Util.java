@@ -50,7 +50,7 @@ public final class Kernel32Util {
 	 * This value cannot be used with {@link #PAGE_NOACCESS}. This flag is not
 	 * supported by the CreateFileMapping function.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/aa366786(v=vs.85).aspx">
 	 *      MSDN webpage#Memory Protection Constants</a>
 	 */
@@ -62,7 +62,7 @@ public final class Kernel32Util {
 	 * results in an access violation.<br/>
 	 * This flag is not supported by the CreateFileMapping function.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/aa366786(v=vs.85).aspx">
 	 *      MSDN webpage#Memory Protection Constants</a>
 	 */
@@ -83,7 +83,7 @@ public final class Kernel32Util {
 	 * _WIN32_WINNT _WIN32_WINNT_WINXP).<br>
 	 * For more information, see Using the Windows Headers.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms684880(v=VS.85).aspx">
 	 *      MSDN webpage#Process Security and Access Rights</a>
 	 */
@@ -97,7 +97,7 @@ public final class Kernel32Util {
 	/**
 	 * Closes an open object handle.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms724211(v=vs.85).aspx">
 	 *      MSDN webpage#CloseHandle function</a>
 	 * @param processHandle
@@ -122,7 +122,7 @@ public final class Kernel32Util {
 	public static ProcessList getProcessList() throws Win32Exception {
 		ProcessList plist = new ProcessList();
 
-		List<PROCESSENTRY32> list = new LinkedList<PROCESSENTRY32>();
+		List<PROCESSENTRY32> list = new LinkedList<>();
 
 		HANDLE hProcessSnap = Kernel32.INSTANCE.CreateToolhelp32Snapshot(Tlhelp32.TH32CS_SNAPPROCESS, new DWORD(0));
 
@@ -183,7 +183,7 @@ public final class Kernel32Util {
 	/**
 	 * Opens an existing local process object.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms684320(v=vs.85).aspx">
 	 *      MSDN webpage#OpenProcess function</a>
 	 * @param dwDesiredAccess
@@ -205,12 +205,12 @@ public final class Kernel32Util {
 	 *         the specified process.<br/>
 	 *         <br/>
 	 *         If the function fails, the return value is <tt>null</tt>. To get
-	 *         extended error information, call {@link #Native.GetLastError()}.
+	 *         extended error information, call {@link Native#getLastError()}.
 	 * @throws Win32Exception
 	 *             If the operation was not successful
 	 */
-	public static HANDLE openProcess(final int dwDesiredAccess, final boolean bInheritHandle, final int dwProcessId)
-			throws Win32Exception {
+	public static HANDLE openProcess(final int dwDesiredAccess,
+			@SuppressWarnings("unused") final boolean bInheritHandle, final int dwProcessId) throws Win32Exception {
 		HANDLE process = Kernel32.INSTANCE.OpenProcess(dwDesiredAccess, false, dwProcessId);
 		if (process == null) {
 			throw new Win32Exception(Native.getLastError());
@@ -222,7 +222,7 @@ public final class Kernel32Util {
 	 * Reads a number of bytes starting at a given address from the memory space
 	 * of a given process.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms680553(v=vs.85).aspx">
 	 *      MSDN webpage#ReadProcessMemory function</a>
 	 * @param process
@@ -249,7 +249,7 @@ public final class Kernel32Util {
 	 * Reads data from an area of memory in a specified process. The entire area
 	 * to be read must be accessible or the operation fails.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms680553(v=vs.85).aspx">
 	 *      MSDN webpage#ReadProcessMemory function</a>
 	 * @param hProcess
@@ -288,7 +288,7 @@ public final class Kernel32Util {
 	 * Retrieves information about a range of pages within the virtual address
 	 * space of a specified process.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/aa366907(v=vs.85).aspx">
 	 *      MSDN webpage#VirtualQueryEx function</a>
 	 * @param hProcess
@@ -321,7 +321,7 @@ public final class Kernel32Util {
 	 * Writes data to an area of memory in a specified process. The entire area
 	 * to be written to must be accessible or the operation fails.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms681674(v=vs.85).aspx">
 	 *      MSDN webpage#WriteProcessMemory function</a>
 	 * @param process
@@ -359,7 +359,7 @@ public final class Kernel32Util {
 	 * Writes data reversely to an area of memory in a specified process. The
 	 * entire area to be written to must be accessible or the operation fails.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms681674(v=vs.85).aspx">
 	 *      MSDN webpage#WriteProcessMemory function</a>
 	 * @param process
@@ -399,7 +399,7 @@ public final class Kernel32Util {
 	 * Writes data to an area of memory in a specified process. The entire area
 	 * to be written to must be accessible or the operation fails.
 	 * 
-	 * @see <a href= <a href=
+	 * @see <a href=
 	 *      "https://msdn.microsoft.com/en-us/library/ms681674(v=vs.85).aspx">
 	 *      MSDN webpage#WriteProcessMemory function</a>
 	 * 

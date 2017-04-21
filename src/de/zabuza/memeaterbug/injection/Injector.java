@@ -33,6 +33,14 @@ public final class Injector {
 	private static final String ATTACH_LIBRARY_NAME = "attach";
 
 	/**
+	 * Loads the native attach library into the built path. It is used for
+	 * attaching to a virtual machine.
+	 */
+	private static void loadAttachLibrary() {
+		System.loadLibrary(ATTACH_LIBRARY_NAME);
+	}
+
+	/**
 	 * The process this object belongs to.
 	 */
 	private final Process mProcess;
@@ -59,9 +67,9 @@ public final class Injector {
 	 *            handle, that has all access rights.
 	 */
 	public Injector(final int processId, final HANDLE processHandle) {
-		mProcess = PsapiUtil.getProcessById(processId);
+		this.mProcess = PsapiUtil.getProcessById(processId);
 		if (processHandle != null) {
-			mProcess.setHandle(processHandle);
+			this.mProcess.setHandle(processHandle);
 		}
 		loadAttachLibrary();
 	}
@@ -128,7 +136,7 @@ public final class Injector {
 			if (threadClassName != null && threadClassName.length() > 0) {
 				argsToPass.append(threadClassName).append(ARG_SEPARATOR);
 			}
-			String processIdAsString = String.valueOf(mProcess.getPid());
+			String processIdAsString = String.valueOf(this.mProcess.getPid());
 			argsToPass.append(processIdAsString);
 			if (additionalArgs != null && additionalArgs.length > 0) {
 				for (String addtionalArg : additionalArgs) {
@@ -179,20 +187,12 @@ public final class Injector {
 	 */
 	public void injectLibraryIntoJar(final String pathToAgentLibrary) throws UnableToInjectException {
 		try {
-			String processIdAsString = String.valueOf(mProcess.getPid());
+			String processIdAsString = String.valueOf(this.mProcess.getPid());
 			VirtualMachine vm = VirtualMachine.attach(processIdAsString);
 			vm.loadAgentLibrary(pathToAgentLibrary);
 			vm.detach();
 		} catch (AttachNotSupportedException | AgentLoadException | AgentInitializationException | IOException e) {
 			throw new UnableToInjectException(ErrorMessages.UNABLE_TO_INJECT_LIBRARY_INTO_JAR);
 		}
-	}
-
-	/**
-	 * Loads the native attach library into the built path. It is used for
-	 * attaching to a virtual machine.
-	 */
-	private void loadAttachLibrary() {
-		System.loadLibrary(ATTACH_LIBRARY_NAME);
 	}
 }
